@@ -1,0 +1,38 @@
+@charset "UTF-8";
+/**
+ *
+ * @authors linteng (875482941@qq.com)
+ * @date    2017-10-15 17:43:35
+ */
+
+@font-face {
+  font-family: 'iconfont';
+  src: url('font/iconfont.eot');
+  src: url('font/iconfont.eot?#iefix') format('embedded-opentype'),
+  url('font/iconfont.woff') format('woff'),
+  url('font/iconfont.ttf') format('truetype'),
+  url('font/iconfont.svg#iconfont') format('svg');
+}
+
+@font-face {
+  font-family: 'code';
+  src: url('font/MANIFESTO.ttf');
+}
+
+.iconfont{
+  font-family:"iconfont" !important;
+  font-size:16px;font-style:normal;
+  -webkit-font-smoothing: antialiased;
+  -webkit-text-stroke-width: 0.2px;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+*{margin: 0;padding: 0;box-sizing: border-box;}
+body,html{width: 100%;height: 100%;-webkit-font-smoothing: antialiased;-webkit-text-stroke-width: 0.2px;-moz-osx-font-smoothing: grayscale;}
+a {text-decoration: none;}
+.ui-fn-cl{ *zoom: 1; }
+.ui-fn-cl:after { content: "."; display: block;height: 0;clear: both;visibility: hidden;overflow:hidden;}
+.ui-fn-fl{float:left;}
+.ui-fn-fr{float:right;}
+
+// @import "compass/reset"

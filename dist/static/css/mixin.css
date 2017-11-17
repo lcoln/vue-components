@@ -1,0 +1,30 @@
+/* line 80, logos/*.png */
+.logos-sprite, .logos-http2, .logos-icons-s7e5c1bbe10, .logos-mvvm, .logos-mysql, .logos-ps {
+  background-image: url('/images/logos-sdd69309a80.png');
+  background-repeat: no-repeat;
+}
+
+/* line 84, ../../../../../../var/lib/gems/2.3.0/gems/compass-core-1.0.3/stylesheets/compass/utilities/sprites/_base.scss */
+.logos-http2 {
+  background-position: 0 0;
+}
+
+/* line 84, ../../../../../../var/lib/gems/2.3.0/gems/compass-core-1.0.3/stylesheets/compass/utilities/sprites/_base.scss */
+.logos-icons-s7e5c1bbe10 {
+  background-position: 0 -250px;
+}
+
+/* line 84, ../../../../../../var/lib/gems/2.3.0/gems/compass-core-1.0.3/stylesheets/compass/utilities/sprites/_base.scss */
+.logos-mvvm {
+  background-position: 0 -1499px;
+}
+
+/* line 84, ../../../../../../var/lib/gems/2.3.0/gems/compass-core-1.0.3/stylesheets/compass/utilities/sprites/_base.scss */
+.logos-mysql {
+  background-position: 0 -1799px;
+}
+
+/* line 84, ../../../../../../var/lib/gems/2.3.0/gems/compass-core-1.0.3/stylesheets/compass/utilities/sprites/_base.scss */
+.logos-ps {
+  background-position: 0 -2311px;
+}
