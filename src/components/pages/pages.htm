@@ -1,0 +1,12 @@
+<div class="do-fn-cl do-fn-noselect ui-pages" ms-class="{{skin}}" ms-if="total > 1">
+    <span ms-if="curr > 1" ms-click="$jump(1)" class="first">首页</span>
+    <span ms-if="curr > 1" ms-click="$jump(curr - 1)">«</span>
+    <span ms-if="curr - Math.floor(max /2) > 1 && total > max">...</span>
+    <span ms-repeat="pages" ms-click="$jump(el)" ms-class="{active: curr == el}">{{el}}</span>
+    <span ms-if="total - curr > Math.floor(max /2) && total > max">...</span>
+    <span ms-if="curr < total" ms-click="$jump(curr + 1)">»</span>
+    <span ms-if="curr < total" ms-click="$jump(total)" class="last">未页</span>
+    <input type="text" ms-if="showJumpBtn" class="txt" ms-duplex="currIndex" />
+    <span class="jump" href="javascript:;" ms-if="showJumpBtn" ms-click="$jump(currIndex)">跳转</span>
+    <span class="msg" ms-if="msg">{{msg}}</span>
+</div>

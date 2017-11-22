@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<title>pages</title>
+<meta name="description" content="">
+<meta name="keywords" content="">
+<link href="" rel="stylesheet">
+<link href="../../css/base.min.css" rel="stylesheet">
+</head>
+<body>
+    <div ms-controller="index">
+        <ul>
+            <li ms-repeat="arr">{{el}}</li>
+        </ul>
+        <ui:pages identifier="indexPages" config="pagesOpts"></ui:pages>
+    </div>
+    <script type="text/javascript" src="../../lib/avalon.min.js"></script>
+    <script type="text/javascript">
+        require(['avalon', '../pages/pages'],function(av){
+            var arr = []
+
+            var Index = av.define({
+                $id: 'index',
+                arr: [],
+                init: function(){
+                    for(var i = 0;i<88;i++){
+                        arr[i] = i
+                    }
+                    Index.arr = showData(arr, 1)
+
+                },
+                pagesOpts: {
+                    skin: 'green',
+                    showJumpBtn: true,
+                    max: 3,
+                    $onSuccess: function(vm){
+                        av.log(vm)
+                        vm.curr = 1
+                        vm.total = Math.ceil(arr.length / 10)
+                    },
+                    $callback: function(pid){
+                        Index.arr = showData(arr, pid)
+                    }
+                }
+            })
+
+            function showData(list, curr){
+                var start = (curr - 1) * 10
+                var end = start + 10
+                var data = []
+                for(var i in list){
+                    if(i < start)
+                        continue
+                    if(i < end)
+                        data.push(list[i])
+                    else
+                        break
+                }
+                return data
+            }
+
+
+            Index.init()
+
+            av.scan()
+        })
+
+
+    </script>
+</body>
+</html>
