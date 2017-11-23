@@ -15,8 +15,11 @@ class WaterFall{
     }
 
     init(parendId, childId, config){
+
         let parentDom = document.getElementById(parendId),
-            childDom = parentDom.querySelectorAll('.' + childId)
+            childDom = parentDom ? parentDom.querySelectorAll('.' + childId) : null
+        if(!parentDom || !childDom)
+            return common.removeListenEvent(window, 'resize', resizeEvent)
 
         if(Object.prototype.toString.call(config) !== '[object Object]')
             console.error('第三个参数须为对象');
@@ -34,16 +37,19 @@ class WaterFall{
         this.setPosition(parentDom, childDom)
 
         let _this = this
-        common.listenEvent(window, 'resize', function(){
+        let resizeEvent = function(){
             let parentDom = document.getElementById(parendId),
-                childDom = parentDom.querySelectorAll('.' + childId)
+                childDom = parentDom ? parentDom.querySelectorAll('.' + childId) : null
 
             _this.setPosition(parentDom, childDom)
-        })
+        }
+
+        common.listenEvent(window, 'resize', resizeEvent)
     }
 
     setPosition(container, box){
-
+        if(!container || !box)
+            return
         let containerw = container.offsetWidth
         let boxMarginLeft = box[0].style.marginLeft.replace('px', '') >> 0
         let boxMarginRight = box[0].style.marginRight.replace('px', '') >> 0

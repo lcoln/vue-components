@@ -44,11 +44,16 @@ a {
 }
 
 /* line 33, ../sass/common.scss */
+li {
+  list-style: none;
+}
+
+/* line 34, ../sass/common.scss */
 .ui-fn-cl {
   *zoom: 1;
 }
 
-/* line 34, ../sass/common.scss */
+/* line 35, ../sass/common.scss */
 .ui-fn-cl:after {
   content: ".";
   display: block;
@@ -58,12 +63,25 @@ a {
   overflow: hidden;
 }
 
-/* line 35, ../sass/common.scss */
+/* line 36, ../sass/common.scss */
 .ui-fn-fl {
   float: left;
 }
 
-/* line 36, ../sass/common.scss */
+/* line 37, ../sass/common.scss */
 .ui-fn-fr {
   float: right;
+}
+
+/* line 39, ../sass/common.scss */
+.ui-fn-noselect {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  user-select: none;
+}
+
+/* line 40, ../sass/common.scss */
+.ui-fn-noselect img, .ui-fn-noselect a {
+  -webkit-user-drag: none;
 }
