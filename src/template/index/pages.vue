@@ -16,8 +16,25 @@
                         <span>{{el.skill}}</span>
                     </li>
                 </ul>
+                <div id="pages"></div>
             </div>
-            <div id="pages"></div>
+            <div class="table">
+                <ul class="th ui-fn-cl">
+                    <li>name</li>
+                    <li>sex</li>
+                    <li>age</li>
+                    <li>skill</li>
+                </ul>
+                <ul class="tr ui-fn-cl">
+                    <li class="td" v-for="el in list2">
+                        <span>{{el.name}}</span>
+                        <span>{{el.sex}}</span>
+                        <span>{{el.age}}</span>
+                        <span>{{el.skill}}</span>
+                    </li>
+                </ul>
+                <div id="pages2"></div>
+            </div>
         </div>
         <pre class="code" v-if="showType == 2" v-text="code">
             <code class="html">
@@ -32,9 +49,9 @@
     import vue from 'vue'
     import Pages from '@/components/pages/main-es6.js'
 
-    function showData(list, curr){
-        var start = (curr - 1) * 10
-        var end = start + 10
+    function showData(list, curr, num = 10){
+        var start = (curr - 1) * num
+        var end = start + num
         var data = []
         for(var i in list){
             if(i < start)
@@ -51,7 +68,8 @@
         data () {
             return {
                 code: ``,
-                list: []
+                list: [],
+                list2: [],
             }
         },
         methods: {
@@ -59,17 +77,38 @@
         },
         mounted: async function(){
             let arr = []
-            for(var i = 0;i<88;i++){
-                arr[i] = {name: 'lili', sex: 'man', age: 19 + i, skill: 'html5'}
+            for(let i = 0;i<88;i++){
+                arr[i] = {name: 'lili', sex: 'man', age: i, skill: 'html5'}
             }
+
+            let arr2 = []
+            for(let i = 0;i<120;i++){
+                arr2[i] = {name: 'lili', sex: 'women', age: 19, skill: `html${i}`}
+            }
+
+
             this.list = showData(arr, 1)
+            this.list2 = showData(arr2, 1, 15)
             let _this = this
             // require('@/components/pointer-hover-slider/main-es5.js')
             var pages = new Pages()
-            pages.init('pages', {total: Math.ceil(arr.length / 10), max: 5}, function(curr){_this.list = showData(arr, curr)})
-            // console.log(pages);
-            /*var pointer2 = new Pages()
-            pointer2.init('pointer2')*/
+            pages.init('pages', {
+                total: Math.ceil(arr.length / 10),
+                max: 8, skin: 'green',
+                showJumpBtn: true
+            }, function(curr){
+                _this.list = showData(arr, curr)
+            })
+
+            var pages2 = new Pages()
+            pages2.init('pages2', {
+                total: Math.ceil(arr2.length / 15),
+                max: 6,
+                skin: 'blue',
+                showJumpBtn: true
+            }, function(curr){
+                _this.list2 = showData(arr2, curr, 15)
+            })
         },
         computed: {
             showType () {
@@ -83,6 +122,7 @@
 </script>
 
 <style rel="stylesheet" lang="scss" type="text/css" scoped>
+    #pages, #pages2{margin: 20px 0;}
     .table{width: 100%;margin-bottom: 20px;color: #666;
         .th{width: 100%;height: 30px;border: 1px solid #999;border-right: none;line-height: 30px;
             li{float: left;height: 100%;width: 25%;border-right: 1px solid #999;line-height: 30px;text-align: center;}

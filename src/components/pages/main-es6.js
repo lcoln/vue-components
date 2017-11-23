@@ -7,7 +7,7 @@
 'use strict'
 
 import * as common from "common";
-let skin = ['blue', 'green', 'pine', 'green1', 'yellow']
+let skin = ['blue', 'green', 'pine', 'darkGreen', 'yellow']
 class Pages{
 
     constructor(){
@@ -17,6 +17,7 @@ class Pages{
         this.skin = 'blue'
         this.msg = ''
         this.curr = 1
+        this.showJumpBtn = false
         this.callback = function(){}
     }
 
@@ -33,13 +34,14 @@ class Pages{
         if(!parentDom)
             return
         let container = document.createElement('div')
-        container.className = ` ui-fn-noselect ui-pages ${this.skin}`
         for(let it of Object.keys(config)){
             if(it === 'skin' && !skin.includes(config[it]))
                 continue
-            if(this[it] || this[it] == 0)
+            if(this[it] || this[it] == 0){
                 this[it] = config[it]
+            }
         }
+        container.className = ` ui-fn-noselect ui-pages ${this.skin}`
         if(this.total > 0){
             this.render(container, this.calculate(1))
         }
@@ -51,23 +53,56 @@ class Pages{
         common.listenEvent(container, 'click', function(ev){
             let target = ev.target
             let curr = _this.curr
-            if(target.nodeName === 'SPAN' && target.innerHTML !== '...'){
+            let total = _this.total
+            if(target.nodeName === 'SPAN' && target.innerHTML !== '...' && target.className !== 'jump'){
 
                 if(parseInt(target.innerHTML) > 0){curr = parseInt(target.innerHTML);}
                 if(target.innerHTML === '首页'){curr = 1}
-                if(target.innerHTML === '«' && _this.curr > 1){curr = --curr}
-                if(target.innerHTML === '»' && curr < _this.total){
-                    curr = ++curr
-                }
-                if(target.innerHTML === '未页'){curr = _this.total}
+                if(target.innerHTML === '«' && curr > 1){curr = --curr}
+                if(target.innerHTML === '»' && curr < total){curr = ++curr}
+                if(target.innerHTML === '未页'){curr = total}
 
                 // console.log(curr, curr);
                 _this.jump(container, curr)
             }
+
+            if(target.nodeName === 'SPAN' && target.className === 'jump'){
+                let txt = container.getElementsByTagName('input')[0].value
+                console.log(txt);
+                if(txt <= 0)
+                    return _this.msg = '页数必须大于0'
+                if(txt > total)
+                    return _this.msg = `最大页数是${total}`
+                if(txt % 1 !== 0)
+                    return _this.msg = `页数必须是整数`
+
+                _this.jump(container, txt)
+                container.getElementsByTagName('input')[0].value = txt
+
+            }
         })
+
+        common.observable(this, 'msg', function(msg){
+            let span = document.createElement('span')
+            span.className = 'msg'
+            span.innerHTML = msg
+            container.appendChild(span)
+            setTimeout(function(){
+                container.removeChild(span)
+            }, 1000)
+        })
+
+
 
     }
 
+
+    /**
+     * [渲染dom结构]
+     * @param  {Dom} container [页码容器]
+     * @param  {Array} pages      [返回dom字符串]
+     * @return {Dom}           [重新渲染dom结构]
+     */
     render(container, pages){
         if(pages.length > 0 && container){
             let dom = '<span class="first">首页</span><span>«</span>'
@@ -83,6 +118,10 @@ class Pages{
                 dom += '<span>...</span>'
 
             dom += '<span>»</span><span class="last">未页</span>'
+
+            if(this.showJumpBtn)
+                dom += '<input type="text" class="txt" /><span class="jump" href="javascript:;">跳转</span>'
+
             container.innerHTML = dom
 
             for(let i = 0, len = container.children.length;i < len;i++){
@@ -92,6 +131,12 @@ class Pages{
         }
     }
 
+    /**
+     * [跳转]
+     * @param  {Dom} container [页码容器]
+     * @param  {Number} curr      [当前跳转页码]
+     * @return {Dom}           [重新渲染dom结构]
+     */
     jump(container, curr){
         if(curr < 1 || curr > this.total)
             return
@@ -103,16 +148,15 @@ class Pages{
             this.msg = '页数不能超过' + this.total + '页'
         }
 
-        if(this.msg){
-            return setTimeout(function(){
-                this.msg = ''
-            },1000)
-        }
         this.curr = curr
         this.render(container, this.calculate(curr))
         this.callback && this.callback(curr)
     }
 
+    /**
+     * [根据当前页码计算得出dom字符串]
+     * @param  {Number} curr [当前页码]
+     */
     calculate(curr){
 
         var dis = Math.floor(this.max / 2)

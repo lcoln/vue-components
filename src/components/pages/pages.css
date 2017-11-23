@@ -14,15 +14,24 @@
 .ui-pages .active{color: #fff;box-shadow: 0px 0 5px #ccc;}
 .ui-pages .txt{border: 1px solid #ddd;width: 30px;height: 31px;margin-left: 4px;letter-spacing: 0;text-align: center;color: #666;}
 .ui-pages .jump{letter-spacing: 0;display: inline-block;width: 50px;margin-left: 2px;border: 1px solid #ddd;text-decoration: none;}
-.ui-pages .msg{display: inline-block;width: auto;background: #D9EDF7;height: 31px;vertical-align: top;color: #828282;padding: 0 5px;margin-left: 2px;border: 0;letter-spacing: 0;}
+.ui-pages .msg{display: inline-block;width: auto;height: 31px;vertical-align: top;color: #828282;padding: 0 5px;margin-left: 2px;border: 0;letter-spacing: 0;line-height: 31px;color: #fff;}
 
 .ui-pages.green{color:#00B29E;}
 .ui-pages.green .active{background: #00B29E;border-color: #00B29E;}
+.ui-pages.green .msg{background: rgba(0, 178, 158, 0.6);}
+
 .ui-pages.blue{color:#00AAD0;}
 .ui-pages.blue .active{background: #00AAD0;border-color: #00AAD0;}
+.ui-pages.blue .msg{background: rgba(0, 170, 208, 0.6);}
+
 .ui-pages.pine{color: #FD5652;}
 .ui-pages.pine .active{background: #FD5652;border-color: #FD5652;}
-.ui-pages.green1{color: #1E4B58;}
-.ui-pages.green1 .active{background: #1E4B58;border-color: #1E4B58;}
+.ui-pages.pine .msg{background: rgba(253, 86, 82, 0.6);}
+
+.ui-pages.darkGreen{color: #1E4B58;}
+.ui-pages.darkGreen .active{background: #1E4B58;border-color: #1E4B58;}
+.ui-pages.darkGreen .msg{background: rgba(30, 75, 88, 0.6);}
+
 .ui-pages.yellow{color: #FEB364;}
 .ui-pages.yellow .active{background: #FEB364;border-color: #FEB364;}
+.ui-pages.yellow .msg{background: rgba(254, 179, 100, 0.6);}
