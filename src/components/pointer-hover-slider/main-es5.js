@@ -61,11 +61,11 @@ var observable = function(obj, prop, cb){
 
 }
 
-window.PointerHover = function (parendId, childId, time){
+window.UiPointerHover = function (parendId, childId, time){
 
 }
 
-PointerHover.prototype.init = function(elm, opt){
+UiPointerHover.prototype.init = function(elm, opt){
     if(Object.prototype.toString.call(opt) !== '[object Object]')
         opt = {}
     opt.angle = opt.angle ? opt.angle.replace('deg', '') : 10

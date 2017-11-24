@@ -28,7 +28,7 @@
 
     import store from 'store'
     import vue from 'vue'
-    import fullpage from '@/components/fullscreen-scroll/main-es6.js'
+    import UiFullScreenScroll from '@/components/fullscreen-scroll/main-es6.js'
     export default {
         data () {
             return {
@@ -49,9 +49,9 @@
 </div>
 
 <script>
-    var fullpage = new fullpage()
+    var fullpage = new UiFullScreenScroll()
     fullpage.init('fullPage', 'page', '.4')
-    var fullpage2 = new fullpage()
+    var fullpage2 = new UiFullScreenScroll()
     fullpage2.init('fullPage2', 'page', '.4')
 <\/script>
 
@@ -80,9 +80,9 @@
         },
         mounted: function(){
             require('@/components/fullscreen-scroll/main-es5.js')
-            var fullpage1 = new Scroll()
+            var fullpage1 = new UiFullScreenScroll()
             fullpage1.init('fullPage', 'page', '.4')
-            var fullpage2 = new Scroll()
+            var fullpage2 = new UiFullScreenScroll()
             fullpage2.init('fullPage2', 'page', '.4')
             // console.log(fullpage2);
         },

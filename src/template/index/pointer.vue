@@ -59,9 +59,9 @@
         },
         mounted: async function(){
             require('@/components/pointer-hover-slider/main-es5.js')
-            var pointer = new PointerHover()
+            var pointer = new UiPointerHover()
             pointer.init('pointer')
-            var pointer2 = new PointerHover()
+            var pointer2 = new UiPointerHover()
             pointer2.init('pointer2')
         },
         computed: {

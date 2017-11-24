@@ -1,0 +1,28 @@
+<div class="ui-datepicker">
+    <input type="text" name="" ms-on-focus="$show" ms-click="$caculateDate" class="date-input" ms-duplex="dateVal" />
+    <dl ms-if="isShow" ms-click="$keepShow">
+        <dt>请选择日期</dt>
+        <dd>
+            <nav class="do-fn-cl">
+                <a href="javascript:;" ms-click="$jump(1, -1)"><<</a>
+                <a href="javascript:;" ms-click="$jump(2, -1)"><</a>
+                <span>{{curYear}} - {{curMonth}}</span>
+                <a href="javascript:;" ms-click="$jump(2, 1)">></a>
+                <a href="javascript:;" ms-click="$jump(1, 1)">>></a>
+            </nav>
+            <ul>
+                <li class="do-fn-cl">
+                    <span>一</span>
+                    <span>二</span>
+                    <span>三</span>
+                    <span>四</span>
+                    <span>五</span>
+                    <span>六</span>
+                    <span>七</span>
+                </li>
+                <li class="msg" ms-if="msg">{{msg}}</li>
+                <li class="do-fn-cl"><span ms-repeat="dateList" ms-click="$getDate(el)" ms-class="{act: el && !el.disabled, disabled: el.disabled}">{{el.day}}</span></li>
+            </ul>
+        </dd>
+    </dl>
+</div>

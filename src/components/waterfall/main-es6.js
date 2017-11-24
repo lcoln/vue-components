@@ -8,7 +8,7 @@
 
 import * as common from "common";
 
-class WaterFall{
+class UiWaterFall{
 
     constructor(){
         this.id = Date.now() + '_waterfall'
@@ -80,4 +80,4 @@ class WaterFall{
 
 }
 
-export default WaterFall
+export default UiWaterFall

@@ -1,0 +1,26 @@
+@charset "UTF-8";
+/**
+ * [日历组件样式]
+ * @authors Lincoln (875482941@qq.com)
+ * @date    2017-03-14 15:53:57
+ *
+ */
+
+
+a{text-decoration: none;}
+.ui-datepicker{}
+.ui-datepicker .date-input{border: 1px solid #ccc;height: 30px;padding-left: 10px;border-radius: 3px;}
+.ui-datepicker dl{width: 230px;text-align: center;padding: 15px;padding-bottom: 0;border: 1px solid #ccc;box-shadow: 0 0 2px #ccc;font-size: 13px;color: #666}
+.ui-datepicker dt{padding: 5px;background: rgba(0,0,0,.1);}
+.ui-datepicker dd{}
+.ui-datepicker dd nav{font-size: 14px;margin: 10px;}
+.ui-datepicker dd nav a{float: left;width: 17%;color: #3FB8AF;}
+.ui-datepicker dd nav span{float: left;width: 32%;}
+.ui-datepicker dd ul{position: relative;}
+.ui-datepicker dd ul li{margin: 10px 0;}
+.ui-datepicker dd ul li:nth-of-type(1){border-top: 1px solid #ccc;padding: 5px;border-bottom: 1px solid #ccc;}
+.ui-datepicker dd ul span{float: left;width: 14.28%;height: 20px;line-height: 20px;cursor: pointer;transition: .4s;}
+
+.ui-datepicker dd ul .msg{position: absolute;top: 21px;left: 50%;margin-left: -75px;width: 150px;height: 30px;line-height: 30px;background: rgba(0,0,0,.6);color: #fff;}
+.ui-datepicker dd ul .act:hover{background: #73C8A9;color: #fff;}
+.ui-datepicker dd ul .disabled{color: #bbb;cursor:not-allowed}

@@ -8,7 +8,7 @@
 import * as common from "common";
 
 
-class PointerHover{
+class UiPointerHover{
     constructor(){
 
     }
@@ -81,4 +81,4 @@ class PointerHover{
     }
 }
 
-export default PointerHover
+export default UiPointerHover

@@ -61,7 +61,7 @@ var observable = function(obj, prop, cb){
 
 }
 
-window.Scroll = function (parendId, childId, time){
+window.UiFullScreenScroll = function (parendId, childId, time){
     this.id = Date.now() + '_scroll'
     this.curPage = 0
     this.init = function(parendId, childId, time){
@@ -120,7 +120,7 @@ window.Scroll = function (parendId, childId, time){
     }
 }
 
-Scroll.prototype.$el = function(parendId, childId, time){
+UiFullScreenScroll.prototype.$el = function(parendId, childId, time){
     var parentDom = document.getElementById(parendId)
     parentDom.style.overflow = 'hidden'
 
@@ -164,6 +164,6 @@ Scroll.prototype.$el = function(parendId, childId, time){
     return parentDom
 }
 
-Scroll.prototype.curHeight = function(){
+UiFullScreenScroll.prototype.curHeight = function(){
     return (window.getComputedStyle ? (window.getComputedStyle(this.el).height).replace('px', '') : this.el.offsetHeight) >> 0
 }

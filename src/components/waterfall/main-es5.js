@@ -63,12 +63,12 @@ var observable = function(obj, prop, cb){
 }
 
 
-window.WaterFall = function (){
+window.UiWaterFall = function (){
     this.id = Date.now() + '_waterfall'
 }
 
 
-WaterFall.prototype.init = function(parendId, childId, config){
+UiWaterFall.prototype.init = function(parendId, childId, config){
     var parentDom = document.getElementById(parendId),
         childDom = parentDom.querySelectorAll('.' + childId)
 
@@ -97,7 +97,7 @@ WaterFall.prototype.init = function(parendId, childId, config){
     })
 }
 
-WaterFall.prototype.setPosition = function(container, box){
+UiWaterFall.prototype.setPosition = function(container, box){
 
     var containerw = container.offsetWidth
     var boxMarginLeft = box[0].style.marginLeft.replace('px', '') >> 0

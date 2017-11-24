@@ -36,8 +36,8 @@
                 <div id="pages2"></div>
             </div>
         </div>
-        <pre class="code" v-if="showType == 2" v-text="code">
-            <code class="html">
+        <pre class="code" v-if="showType == 2">
+            <code class="html" v-text="code">
 
             </code>
         </pre>
@@ -47,7 +47,7 @@
 <script>
     import store from 'store'
     import vue from 'vue'
-    import Pages from '@/components/pages/main-es6.js'
+    // import UiPages from '@/components/pages/main-es6.js'
 
     function showData(list, curr, num = 10){
         var start = (curr - 1) * num
@@ -67,7 +67,27 @@
     export default {
         data () {
             return {
-                code: ``,
+                code: `
+<div id="pages"></div>
+<div id="pages2"></div>
+<script type="text/javascript">
+    var pages = new UiPages()
+    pages.init('pages', {
+        total: Number,      //总页数
+        max: Number,        //最大页数
+        skin: String,       //组件皮肤['blue', 'green', 'pine', 'darkGreen', 'yellow'] dafault: blue
+        showJumpBtn: true   //跳转按钮. true: 显示; false: 不显示
+    }, function(curr){      //curr: 点击页码回调的页码
+        //dosomething rander data
+    })
+    var pages2 = new UiPages()
+    pages2.init('pages2', {
+        total: Number,      //总页数
+        max: Number,        //最大页数
+    }, function(curr){
+        //dosomething rander data
+    })
+<\/script>`,
                 list: [],
                 list2: [],
             }
@@ -90,8 +110,8 @@
             this.list = showData(arr, 1)
             this.list2 = showData(arr2, 1, 15)
             let _this = this
-            // require('@/components/pointer-hover-slider/main-es5.js')
-            var pages = new Pages()
+            require('@/components/pages/main-es5.js')
+            var pages = new UiPages()
             pages.init('pages', {
                 total: Math.ceil(arr.length / 10),
                 max: 8, skin: 'green',
@@ -100,7 +120,7 @@
                 _this.list = showData(arr, curr)
             })
 
-            var pages2 = new Pages()
+            var pages2 = new UiPages()
             pages2.init('pages2', {
                 total: Math.ceil(arr2.length / 15),
                 max: 6,

@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>datepicker</title>
+<meta name="description" content="">
+<meta name="keywords" content="">
+<link href="../../css/base.min.css" rel="stylesheet">
+<style>
+    *:focus{outline: none;}
+    body{padding: 10px;}
+    .datepicker{float: left;margin: 0 10px;}
+    .title{float: left;}
+</style>
+</head>
+<body>
+    <div ms-controller="index">
+        <span class="title">datepicker:</span>
+        <ui:datepicker class="datepicker" identifier="indexDatepicker" config="datepickerOpts"></ui:datepicker>
+        <ui:datepicker class="datepicker" identifier="indexDatepicker1" config="datepickerOpts"></ui:datepicker>
+    </div>
+    <script type="text/javascript" src="../../lib/avalon.min.js"></script>
+    <script type="text/javascript">
+        require(['avalon', '../datepicker/datepicker'],function(av){
+
+            var Index = av.define({
+                $id: 'index',
+                datepickerOpts: {
+                    minDate: Date.now() - 10 * 60 * 60 * 24 * 1000,
+                    maxDate: Date.now() + 15 * 60 * 60 * 24 * 1000,
+                    $onSuccess: function(vm){
+                        av.log(vm)
+                    }
+                }
+            })
+
+            av.scan()
+        })
+
+
+    </script>
+</body>
+</html>

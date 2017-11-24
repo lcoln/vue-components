@@ -8,7 +8,7 @@
 
 import * as common from "common";
 
-class Scroll{
+class UiFullScreenScroll{
 
 
     constructor(){
@@ -44,7 +44,7 @@ class Scroll{
             ;(function(i){
                 common.listenEvent(btn, 'click', function(){
                     _this.curPage = i
-                    container.style.transform = 'translate(0px, ' + -Scroll.curHeight(parentDom) * _this.curPage + 'px)'
+                    container.style.transform = 'translate(0px, ' + -UiFullScreenScroll.curHeight(parentDom) * _this.curPage + 'px)'
                 })
             })(i);
             frag.appendChild(btn)
@@ -67,7 +67,7 @@ class Scroll{
 
     init(parendId, childId, time){
         this.el = this.$el(parendId, childId, time)
-        Scroll.curHeight(this.el)
+        UiFullScreenScroll.curHeight(this.el)
         var container = this.el.querySelector('.' + childId).parentNode,
         childDom = container.childNodes
 
@@ -91,14 +91,14 @@ class Scroll{
                     }
 
                 }
-                container.style.transform = 'translate(0px, ' + -Scroll.curHeight(_this.el) * _this.curPage + 'px)'
+                container.style.transform = 'translate(0px, ' + -UiFullScreenScroll.curHeight(_this.el) * _this.curPage + 'px)'
                 now = Date.now()
             }
         })
         common.listenEvent(window, 'resize', function(){
 
             container.style.transition = '0s'
-            container.style.transform = 'translate(0px, ' + -Scroll.curHeight(_this.el) * _this.curPage + 'px)'
+            container.style.transform = 'translate(0px, ' + -UiFullScreenScroll.curHeight(_this.el) * _this.curPage + 'px)'
             setTimeout(function(){
                 container.style.transition = time.indexOf('s') < 0 ? time + 's' : time
             }, 0)
@@ -124,4 +124,4 @@ class Scroll{
 
 }
 
-export default Scroll
+export default UiFullScreenScroll

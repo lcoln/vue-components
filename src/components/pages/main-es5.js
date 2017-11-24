@@ -61,109 +61,169 @@ var observable = function(obj, prop, cb){
 
 }
 
-window.Scroll = function (parendId, childId, time){
-    this.id = Date.now() + '_scroll'
-    this.curPage = 0
-    this.init = function(parendId, childId, time){
-        this.el = this.$el(parendId, childId, time)
-        var container = this.el.querySelector('.' + childId).parentNode,
-        childDom = container.childNodes
+var skin = ['blue', 'green', 'pine', 'darkGreen', 'yellow']
+window.UiPages = function (){
 
-        var mouseWheelEv = /Firefox/i.test(navigator.userAgent) ? "DOMMouseScroll": "mousewheel",
-        direction = /Firefox/i.test(navigator.userAgent) ? "detail": "deltaY",
-        now = Date.now()
-        var _this = this
-        listen(this.el, mouseWheelEv, function(ev){
-            if(Date.now() - now > 1000){
-                if(ev[direction] > 0){
-                    if(_this.curPage + 1 < childDom.length){
-                        _this.curPage++
-                    }else{
-                        _this.curPage = 0
-                    }
-                }else{
-                    if(_this.curPage - 1 >= 0){
-                        _this.curPage--
-                    }else{
-                        _this.curPage = childDom.length - 1
-                    }
-
-                }
-                container.style.transform = 'translate(0px, ' + -_this.curHeight() * _this.curPage + 'px)'
-                now = Date.now()
-            }
-        })
-
-        listen(window, 'resize', function(){
-
-            container.style.transition = '0s'
-            container.style.transform = 'translate(0px, ' + -_this.curHeight() * _this.curPage + 'px)'
-            setTimeout(function(){
-                container.style.transition = time.indexOf('s') < 0 ? time + 's' : time
-            }, 0)
-        })
-
-        observable(this, 'curPage', function(index){
-            var btnGroup = document.getElementById('ui-fullpage-btn-' + _this.id),
-                span = btnGroup.childNodes
-            for(var i = 0;i < span.length;i++){
-                if(i == index){
-                    span[index].style.background = '#f30'
-                    span[index].style.transform = 'scale(1.5)'
-                }else{
-                    span[i].style.background = 'rgba(255,255,255,.6)'
-                    span[i].style.transform = ''
-                }
-            }
-
-        })
-    }
-}
-
-Scroll.prototype.$el = function(parendId, childId, time){
-    var parentDom = document.getElementById(parendId)
-    parentDom.style.overflow = 'hidden'
-
-    var childDom = parentDom.querySelectorAll('.' + childId)
-    var container = document.createElement('section')
-    var btnGroup = document.createElement('section')
-
-    var span = document.createElement('span')
-    var frag = document.createDocumentFragment()
-    var transition = time.indexOf('s') < 0 ? time + 's' : time
-    var _this = this
-    for(var i = 0;i < childDom.length;i++){
-        container.appendChild(childDom[i])
-        var btn = span.cloneNode(false)
-        btn.setAttribute('style', 'display: inline-block;width: 10px;height: 10px;border-radius: 100%;background: rgba(255,255,255,.6);transition: .4s;')
-        if(i == 0){
-            btn.style.background = '#f30'
-            btn.style.transform = 'scale(1.5)'
+    this.init = function(parendId, config, callback){
+        var parentDom = document.getElementById(parendId)
+        if(!parentDom)
+            return
+        var container = document.createElement('div')
+        container.className = ` ui-fn-noselect ui-pages ${this.skin}`
+        if(this.total > 0){
+            this.render(container, this.calculate(1))
         }
-        ;(function(i){
-            listen(btn, 'click', function(){
-                _this.curPage = i
-                container.style.transform = 'translate(0px, ' + -_this.curHeight() * _this.curPage + 'px)'
-            })
-        })(i);
-        frag.appendChild(btn)
+        parentDom.appendChild(container)
+
+        for(var it of Object.keys(config)){
+            if(it === 'skin' && !skin.includes(config[it]))
+                continue
+            if(this[it] || this[it] == 0){
+                this[it] = config[it]
+            }
+        }
+
+        if(!UiPages.prototype.hasCss){
+            document.head.innerHTML += '<link rel="stylesheet" type="text/css" href="/static/css/pages/pages.css">'
+        }
+        UiPages.prototype.hasCss = true
+
+        this.callback = callback
+        var _this = this
+        listen(container, 'click', function(ev){
+            var target = ev.target
+            var curr = _this.curr
+            var total = _this.total
+            if(target.nodeName === 'SPAN' && target.innerHTML !== '...' && target.className !== 'jump'){
+
+                if(parseInt(target.innerHTML) > 0){curr = parseInt(target.innerHTML);}
+                if(target.innerHTML === '首页'){curr = 1}
+                if(target.innerHTML === '«' && curr > 1){curr = --curr}
+                if(target.innerHTML === '»' && curr < total){curr = ++curr}
+                if(target.innerHTML === '未页'){curr = total}
+
+                // console.log(curr, curr);
+                _this.jump(container, curr)
+            }
+
+            if(target.nodeName === 'SPAN' && target.className === 'jump'){
+                var txt = container.getElementsByTagName('input')[0].value
+                // console.log(txt);
+                if(txt <= 0)
+                    return _this.msg = '页数必须大于0'
+                if(txt > total)
+                    return _this.msg = `最大页数是${total}`
+                if(txt % 1 !== 0)
+                    return _this.msg = `页数必须是整数`
+
+                _this.jump(container, txt)
+                container.getElementsByTagName('input')[0].value = txt
+
+            }
+        })
+
+        observable(this, 'msg', function(msg){
+            var span = document.createElement('span')
+            span.className = 'msg'
+            span.innerHTML = msg
+            container.appendChild(span)
+            setTimeout(function(){
+                container.removeChild(span)
+            }, 1000)
+        })
+
     }
-    btnGroup.appendChild(frag)
-    btnGroup.setAttribute('style', 'position: absolute;right: 10px;top: 50%;width: 10px;text-align: center;transform: translate(0, -50%);transition: '+ transition +' ')
-    btnGroup.id = 'ui-fullpage-btn-' + this.id
-
-    container.style.width = '100%'
-    container.style.height = '100%'
-    container.style.transition = time.indexOf('s') < 0 ? time + 's' : time
-    container.id = 'pageName-' + this.id
-
-
-    parentDom.style.position = 'relative'
-    parentDom.appendChild(container)
-    parentDom.appendChild(btnGroup)
-    return parentDom
 }
 
-Scroll.prototype.curHeight = function(){
-    return (window.getComputedStyle ? (window.getComputedStyle(this.el).height).replace('px', '') : this.el.offsetHeight) >> 0
+UiPages.prototype = {
+    id: Date.now() + '_pages',
+    max: 5,
+    total: 0,
+    skin: 'blue',
+    msg: '',
+    curr: 1,
+    showJumpBtn: false,
+    callback: function(){},
+    /**
+     * [渲染dom结构]
+     * @param  {Dom} container [页码容器]
+     * @param  {Array} pages      [返回dom字符串]
+     * @return {Dom}           [重新渲染dom结构]
+     */
+    render: function(container, pages){
+        if(pages.length > 0 && container){
+            var dom = '<span class="first">首页</span><span>«</span>'
+
+            if(this.curr - Math.floor(this.max /2) > 1 && this.total > this.max)
+                dom += '<span>...</span>'
+
+            pages.map((v, i) => {
+                dom += v
+            })
+
+            if(this.total - this.curr > Math.floor(this.max /2) && this.total > this.max)
+                dom += '<span>...</span>'
+
+            dom += '<span>»</span><span class="last">未页</span>'
+
+            if(this.showJumpBtn)
+                dom += '<input type="text" class="txt" /><span class="jump" href="javascript:;">跳转</span>'
+
+            container.innerHTML = dom
+
+            var firstChild = container.firstChild
+            while (firstChild) {
+                if(firstChild.innerHTML == this.curr){
+                    firstChild.className = 'active'
+                }
+                firstChild = firstChild.nextSibling
+            }
+        }
+    },
+    /**
+     * [跳转]
+     * @param  {Dom} container [页码容器]
+     * @param  {Number} curr      [当前跳转页码]
+     * @return {Dom}           [重新渲染dom结构]
+     */
+    jump: function(container, curr){
+        if(curr < 1 || curr > this.total)
+            return
+
+        if(!(curr >> 0 > 0)){
+            this.msg = '页码不符合格式'
+        }
+        else if(curr > this.total){
+            this.msg = '页数不能超过' + this.total + '页'
+        }
+
+        this.curr = curr
+        this.render(container, this.calculate(curr))
+        this.callback && this.callback(curr)
+    },
+    /**
+     * [根据当前页码计算得出dom字符串]
+     * @param  {Number} curr [当前页码]
+     */
+    calculate: function(curr){
+
+        var dis = Math.floor(this.max / 2)
+        var start
+        if(this.total - curr < dis && this.total >= this.max)
+            start = this.total - (this.max - 1)
+        else if(curr - dis > 0 && this.total >= this.max)
+            start = curr - dis
+        else
+            start = 1
+
+        var end = start + (this.max - 1) < this.total ? start + (this.max - 1) : this.total
+        var pages = []
+        for(var i = 0,s = start,e = end;i<this.max;i++,s++){
+            if(s <= e)
+                pages[i] = `<span>${s}</span>`
+        }
+        return pages
+    }
 }
+
+UiPages.prototype.hasCss = false
