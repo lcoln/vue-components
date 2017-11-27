@@ -9,8 +9,9 @@
 *{outline: none;}
 .ms-controller,[ms-controller]{visibility: hidden;}
 .ui-pages{height: 31px;line-height: 29px;text-align: center;letter-spacing: -4px;font-size: 13px;}
-.ui-pages span{display: inline-block;width: 30px;margin-left: -1px;cursor: pointer;border: 1px solid #ddd;letter-spacing: 0;}
+.ui-pages span{display: inline-block;width: 30px;border: 1px solid #ddd;border-right: none;cursor: pointer;letter-spacing: 0;}
 .ui-pages .first,.ui-pages .last{width: 50px;}
+.ui-pages .last{border-right: 1px solid #ddd;}
 .ui-pages .active{color: #fff;box-shadow: 0px 0 5px #ccc;}
 .ui-pages .txt{border: 1px solid #ddd;width: 30px;height: 31px;margin-left: 4px;letter-spacing: 0;text-align: center;color: #666;}
 .ui-pages .jump{letter-spacing: 0;display: inline-block;width: 50px;margin-left: 2px;border: 1px solid #ddd;text-decoration: none;}

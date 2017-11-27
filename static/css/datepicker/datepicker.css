@@ -14,12 +14,13 @@ a{text-decoration: none;}
 .ui-datepicker dt{padding: 5px;background: rgba(0,0,0,.1);}
 .ui-datepicker dd{}
 .ui-datepicker dd nav{font-size: 14px;margin: 10px;}
-.ui-datepicker dd nav a{float: left;width: 17%;color: #3FB8AF;}
-.ui-datepicker dd nav span{float: left;width: 32%;}
+.ui-datepicker dd nav a{float: left;width: 15%;color: #3FB8AF;}
+.ui-datepicker dd nav span{float: left;width: 40%;}
 .ui-datepicker dd ul{position: relative;}
 .ui-datepicker dd ul li{margin: 10px 0;}
 .ui-datepicker dd ul li:nth-of-type(1){border-top: 1px solid #ccc;padding: 5px;border-bottom: 1px solid #ccc;}
-.ui-datepicker dd ul span{float: left;width: 14.28%;height: 20px;line-height: 20px;cursor: pointer;transition: .4s;}
+.ui-datepicker dd ul span{float: left;width: 14.28%;height: 20px;line-height: 20px;transition: .4s;}
+.ui-datepicker dd ul .date-list span{cursor: pointer;}
 
 .ui-datepicker dd ul .msg{position: absolute;top: 21px;left: 50%;margin-left: -75px;width: 150px;height: 30px;line-height: 30px;background: rgba(0,0,0,.6);color: #fff;}
 .ui-datepicker dd ul .act:hover{background: #73C8A9;color: #fff;}

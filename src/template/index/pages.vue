@@ -119,6 +119,7 @@
             }, function(curr){
                 _this.list = showData(arr, curr)
             })
+            // vue.log(pages)
 
             var pages2 = new UiPages()
             pages2.init('pages2', {

@@ -113,6 +113,15 @@ window.UiDatePicker = function (){
             _this.keepShow(ev)
         })
 
+        listen(container.querySelector('.date-list'), 'click', function(ev){
+            var target = ev.target
+            if(target.nodeName === 'SPAN'){
+                if(!target.className || target.className === 'disabled')
+                    return
+                container.querySelector('.date-input').value = _this.curYear + '-' + _this.curMonth + '-' + target.innerHTML
+            }
+        })
+
         listen(container.querySelector('.date-nav'), 'click', function(ev){
             var target = ev.target
             if(target.nodeName === 'A'){
@@ -155,16 +164,21 @@ window.UiDatePicker = function (){
 
 
         observable(_this, 'curYear',function(v){
+            container.querySelector('.date-val').innerHTML = _this.curYear + '-' + _this.curMonth
             calculate(_this, v, _this.curMonth)
         })
 
         observable(_this, 'curMonth',function(v){
+            console.log(1111)
+            container.querySelector('.date-val').innerHTML = _this.curYear + '-' + _this.curMonth
             calculate(_this, _this.curYear, v)
         })
 
         observable(_this, 'dateList',function(v){
-            console.log(_this.dateList);
-            _this.render(container.querySelector('.date-list'))
+            setTimeout(function(){
+                console.log(3333)
+                _this.render(container.querySelector('.date-list'))
+            }, 0)
         })
 
         observable(_this, 'msg',function(v){
@@ -226,9 +240,10 @@ UiDatePicker.prototype = {
         if((time < this.minDate || time > this.maxDate) || (year < this.opts.miny || month < this.opts.minm || year > this.opts.maxy || month > this.opts.maxm))
             return this.msg = '超过日期限制'
         month = fullNum(month)
-        this.curYear = year
-        this.curMonth = month
-        // console.log(this.curYear, this.curMonth);
+        if(year !== this.curYear)
+            this.curYear = year
+        if(month !== this.curMonth)
+            this.curMonth = month
     },
     getDate: function(v){
         if(v && !v.disabled){
@@ -245,6 +260,7 @@ UiDatePicker.prototype = {
      */
     render: function(container){
         let dates = this.dateList
+        // console.log(dates);
         if(dates.length > 0 && container){
             var dom = ''
             var className = ''
@@ -253,7 +269,7 @@ UiDatePicker.prototype = {
                 dom += '<span class="' + className + '">' + dates[i].day + '</span>'
             }
             container.innerHTML = dom
-            // console.log(dom, dates);
+            // console.log(container);
         }
 
     }
@@ -290,7 +306,7 @@ function calculate(vm, y, m){
             disabled: vm.curYear < vm.opts.miny || i < 0 ? true : (vm.curMonth >= vm.opts.minm ? (time <= vm.minDate || time >= vm.maxDate ? true : false) : true)
         })
     }
-    console.log(vm.dateList);
+    console.log(2222);
 }
 
 function escape2Html(str) {

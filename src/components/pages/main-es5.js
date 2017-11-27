@@ -68,12 +68,6 @@ window.UiPages = function (){
         var parentDom = document.getElementById(parendId)
         if(!parentDom)
             return
-        var container = document.createElement('div')
-        container.className = ` ui-fn-noselect ui-pages ${this.skin}`
-        if(this.total > 0){
-            this.render(container, this.calculate(1))
-        }
-        parentDom.appendChild(container)
 
         for(var it of Object.keys(config)){
             if(it === 'skin' && !skin.includes(config[it]))
@@ -82,6 +76,14 @@ window.UiPages = function (){
                 this[it] = config[it]
             }
         }
+
+        var container = document.createElement('div')
+        container.className = ` ui-fn-noselect ui-pages ${this.skin}`
+        
+        if(this.total > 0){
+            this.render(container, this.calculate(1))
+        }
+        parentDom.appendChild(container)
 
         if(!UiPages.prototype.hasCss){
             document.head.innerHTML += '<link rel="stylesheet" type="text/css" href="/static/css/pages/pages.css">'
