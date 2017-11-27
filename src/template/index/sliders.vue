@@ -1,26 +1,44 @@
 <template>
-    <div></div>
+    <div>
+        <div class="exam" v-show="showType == 1">
+            <div id="slider"></div>
+        </div>
+        <pre class="code" v-if="showType == 2" v-text="code">
+            <code class="html">
+
+            </code>
+        </pre>
+    </div>
 </template>
 
 <script>
+    import store from 'store'
     import vue from 'vue'
+    // import UiSliders from '@/components/sliders/main-es6.js'
 
     export default {
         name: 'app',
         data () {
             return {
-
+                code: ``
             }
         },
         methods: {
 
         },
-        mounted: async function(){
-
+        mounted: function(){
+            require('@/components/sliders/main-es5.js')
+            var slider = new UiSliders()
+            slider.init('slider')
+            /*var slider2 = new UiSliders()
+            slider2.init('slider2', 'page', '.4')*/
+            // console.log(fullpage2);
         },
-        components: {
-
-        }
+        computed: {
+            showType () {
+                return store.state.showType
+            }
+        },
     }
 </script>
 
