@@ -1,7 +1,8 @@
 <template>
     <div style="height: 100%;">
         <div class="exam" v-show="showType == 1">
-            <div id="datePicker"></div>
+            <div id="datePicker" style="display: inline-block;"></div>
+            <div id="datePicker2" style="display: inline-block;vertical-align: top;"></div>
         </div>
         <pre class="code" v-if="showType == 2">
             <code class="html" v-text="code">
@@ -14,7 +15,7 @@
 <script>
     import store from 'store'
     import vue from 'vue'
-    // import UiDatePicker from '@/components/pages/main-es6.js'
+    import UiDatePicker from '@/components/datepicker/main-es6.js'
 
     export default {
         name: 'app',
@@ -27,9 +28,18 @@
 
         },
         mounted: async function(){
-            require('@/components/datepicker/main-es5.js')
+            // require('@/components/datepicker/main-es5.js')
             var datePicker = new UiDatePicker()
-            datePicker.init('datePicker')
+            datePicker.init('datePicker', {
+                maxDate: Date.now() + 240 * 60 * 60 * 24 * 1000,
+                minDate: Date.now() - 240 * 60 * 60 * 24 * 1000
+            })
+
+            var datePicker2 = new UiDatePicker()
+            datePicker2.init('datePicker2', {
+                maxDate: Date.now() + 240 * 60 * 60 * 24 * 1000,
+                minDate: Date.now() - 240 * 60 * 60 * 24 * 1000
+            })
 
         },
         computed: {

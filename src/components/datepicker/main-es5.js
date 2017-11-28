@@ -61,13 +61,13 @@ var observable = function(obj, prop, cb){
 
 }
 
-var noop = function(){}
 var now = new Date()
 var curMonth = now.getMonth() + 1
 var curYear = now.getFullYear()
 var curDay = now.getDate()
 var minDate = Date.now() - 40 * 60 * 60 * 24 * 1000,
     maxDate = Date.now() + 10 * 60 * 60 * 24 * 1000
+var monthChange = false
 
 function filterDate(date, format){
     switch(format) {
@@ -91,6 +91,14 @@ window.UiDatePicker = function (){
         var parentDom = document.getElementById(parendId)
         if(!parentDom)
             return
+
+        if(config){
+            for(var it of Object.keys(config)){
+                if(this[it] || this[it] == 0){
+                    this[it] = config[it]
+                }
+            }
+        }
 
         if(!UiDatePicker.prototype.hasCss){
             document.head.innerHTML += '<link rel="stylesheet" type="text/css" href="/static/css/datepicker/datepicker.css">'
@@ -119,13 +127,17 @@ window.UiDatePicker = function (){
                 if(!target.className || target.className === 'disabled')
                     return
                 container.querySelector('.date-input').value = _this.curYear + '-' + _this.curMonth + '-' + target.innerHTML
+                _this.dateVal = container.querySelector('.date-input').value
+                _this.render(container.querySelector('.date-list'))
+                callback && callback()
             }
         })
 
         listen(container.querySelector('.date-nav'), 'click', function(ev){
             var target = ev.target
             if(target.nodeName === 'A'){
-                switch(escape2Html(target.innerHTML)) {
+                var text = escape2Html(target.innerHTML)
+                switch(text) {
                     case '<<':
                         _this.jump(1, -1)
                         break;
@@ -146,13 +158,14 @@ window.UiDatePicker = function (){
             _this.isShow = !1
         })
 
+
         this.opts = {
             maxy: this.maxDate && filterDate(this.maxDate, 'Y'),
             miny: this.minDate && filterDate(this.minDate, 'Y'),
-            maxm: this.maxDate && filterDate(this.maxDate, 'm'),
-            minm: this.minDate && filterDate(this.minDate, 'm'),
-            maxd: this.maxDate && filterDate(this.maxDate, 'd'),
-            mind: this.minDate && filterDate(this.minDate, 'd')
+            maxm: this.maxDate && fullNum(filterDate(this.maxDate, 'm')),
+            minm: this.minDate && fullNum(filterDate(this.minDate, 'm')),
+            maxd: this.maxDate && fullNum(filterDate(this.maxDate, 'd')),
+            mind: this.minDate && fullNum(filterDate(this.minDate, 'd'))
         }
 
         calculate(this, this.curYear, this.curMonth)
@@ -161,36 +174,42 @@ window.UiDatePicker = function (){
 
         parentDom.appendChild(container)
 
-
-
         observable(_this, 'curYear',function(v){
-            container.querySelector('.date-val').innerHTML = _this.curYear + '-' + _this.curMonth
+            if(monthChange)
+                return
             calculate(_this, v, _this.curMonth)
+            container.querySelector('.date-val').innerHTML = _this.curYear + '-' + _this.curMonth
         })
 
         observable(_this, 'curMonth',function(v){
-            console.log(1111)
-            container.querySelector('.date-val').innerHTML = _this.curYear + '-' + _this.curMonth
-            calculate(_this, _this.curYear, v)
+            monthChange = true
+            setTimeout(function(){
+                calculate(_this, _this.curYear, v)
+                container.querySelector('.date-val').innerHTML = _this.curYear + '-' + _this.curMonth
+                monthChange = false
+            }, 0)
         })
 
         observable(_this, 'dateList',function(v){
             setTimeout(function(){
-                console.log(3333)
                 _this.render(container.querySelector('.date-list'))
             }, 0)
         })
 
         observable(_this, 'msg',function(v){
+            if(!v)
+                return
             container.querySelector('.msg').innerHTML = v
+            container.querySelector('.msg').style.display = 'block'
             setTimeout(function(){
+                container.querySelector('.msg').style.display = 'none'
                 _this.msg = ''
             },1000)
         })
 
-        observable(this, 'dateVal', function(v){
+        /*observable(this, 'dateVal', function(v){
             container.querySelector('.date-input').value = v
-        })
+        })*/
 
         observable(this, 'isShow', function(v){
             container.querySelector('.date-dl').style.display = v ? 'block' : 'none'
@@ -202,6 +221,7 @@ window.UiDatePicker = function (){
 UiDatePicker.prototype = {
     curYear: curYear,
     curMonth: curMonth < 10 ? '0' + curMonth : curMonth,
+    currDay: curDay,
     dateList: [],
     isShow: false,
     dateVal: '',
@@ -236,14 +256,14 @@ UiDatePicker.prototype = {
         }
 
         var time = new Date(year + '-' + month, curDay).getTime()
-
-        if((time < this.minDate || time > this.maxDate) || (year < this.opts.miny || month < this.opts.minm || year > this.opts.maxy || month > this.opts.maxm))
-            return this.msg = '超过日期限制'
         month = fullNum(month)
-        if(year !== this.curYear)
-            this.curYear = year
+
+        if((time < this.minDate || time > this.maxDate) || (year + '' + month < this.opts.miny + '' + this.opts.minm) || (year + '' + month > this.opts.maxy + '' + this.opts.maxm))
+            return this.msg = '超过日期限制'
         if(month !== this.curMonth)
             this.curMonth = month
+        if(year !== this.curYear)
+            this.curYear = year
     },
     getDate: function(v){
         if(v && !v.disabled){
@@ -251,7 +271,6 @@ UiDatePicker.prototype = {
             this.dateVal = this.curYear + '-' + this.curMonth + '-' + v.day
         }
     },
-    callback: function(){},
     /**
      * [渲染dom结构]
      * @param  {Dom} container [页码容器]
@@ -260,12 +279,12 @@ UiDatePicker.prototype = {
      */
     render: function(container){
         let dates = this.dateList
-        // console.log(dates);
         if(dates.length > 0 && container){
             var dom = ''
             var className = ''
             for(var i = 0, len = dates.length;i < len;i++){
                 className = dates[i].disabled ? 'disabled' : 'act'
+                className += this.curYear + '-' + this.curMonth + '-' + dates[i].day == this.dateVal ? ' select' : ''
                 dom += '<span class="' + className + '">' + dates[i].day + '</span>'
             }
             container.innerHTML = dom
@@ -279,7 +298,7 @@ UiDatePicker.prototype.hasCss = false
 
 function fullNum(num){
     if(num < 10)
-        return '0' + num
+        return '0' + parseInt(num)
 
     return num
 }
@@ -301,12 +320,20 @@ function calculate(vm, y, m){
     firstDay = firstDay == 0 ? 7 : firstDay
     for(var i = 1 - firstDay;i < getMonth(y, m);i++){
         var time = new Date(y, m - 1, i + 1).getTime()
+        var disabled = false
+
+        if(vm.curYear + '' + vm.curMonth + fullNum(i) < vm.opts.miny + '' + vm.opts.minm + vm.opts.mind){
+            disabled = true
+        }
+        else if(vm.curYear + '' + vm.curMonth + fullNum(i) > vm.opts.maxy + '' + vm.opts.maxm + vm.opts.maxd){
+            disabled = true
+        }
+
         vm.dateList.push({
             day: i >= 0 ? i + 1 : '',
-            disabled: vm.curYear < vm.opts.miny || i < 0 ? true : (vm.curMonth >= vm.opts.minm ? (time <= vm.minDate || time >= vm.maxDate ? true : false) : true)
+            disabled: disabled
         })
     }
-    console.log(2222);
 }
 
 function escape2Html(str) {

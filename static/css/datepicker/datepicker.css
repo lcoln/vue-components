@@ -9,7 +9,7 @@
 
 a{text-decoration: none;}
 .ui-datepicker{}
-.ui-datepicker .date-input{border: 1px solid #ccc;height: 30px;padding-left: 10px;border-radius: 3px;}
+.ui-datepicker .date-input{border: 1px solid #ccc;height: 30px;padding-left: 10px;border-radius: 3px;outline: none;}
 .ui-datepicker dl{width: 230px;text-align: center;padding: 15px;padding-bottom: 0;border: 1px solid #ccc;box-shadow: 0 0 2px #ccc;font-size: 13px;color: #666}
 .ui-datepicker dt{padding: 5px;background: rgba(0,0,0,.1);}
 .ui-datepicker dd{}
@@ -24,4 +24,5 @@ a{text-decoration: none;}
 
 .ui-datepicker dd ul .msg{position: absolute;top: 21px;left: 50%;margin-left: -75px;width: 150px;height: 30px;line-height: 30px;background: rgba(0,0,0,.6);color: #fff;}
 .ui-datepicker dd ul .act:hover{background: #73C8A9;color: #fff;}
+.ui-datepicker dd ul .act.select{background: #73C8A9;color: #fff;}
 .ui-datepicker dd ul .disabled{color: #bbb;cursor:not-allowed}

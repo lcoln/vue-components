@@ -7,18 +7,89 @@
 'use strict'
 
 import * as common from "common";
-let skin = ['blue', 'green', 'pine', 'darkGreen', 'yellow']
-class UiPages{
+
+
+let now = new Date()
+let curMonth = now.getMonth() + 1
+let curYear = now.getFullYear()
+let curDay = now.getDate()
+let minDate = Date.now() - 40 * 60 * 60 * 24 * 1000,
+    maxDate = Date.now() + 10 * 60 * 60 * 24 * 1000
+let monthChange = false
+
+function fullNum(num){
+    if(num < 10)
+        return '0' + parseInt(num)
+
+    return num
+}
+
+//获取当月天数
+function getMonth(y, m){
+    return new Date(y, m, 0).getDate()
+}
+
+//获取当月第一天是星期几
+function getDay(y, m){
+    return new Date(y, m - 1, 1).getDay()
+}
+
+//计算当月日历
+function calculate(vm, y, m){
+    vm.dateList = []
+    let firstDay = getDay(y, m)
+    firstDay = firstDay == 0 ? 7 : firstDay
+    for(let i = 1 - firstDay;i < getMonth(y, m);i++){
+        let time = new Date(y, m - 1, i + 1).getTime()
+        let disabled = false
+
+        if(vm.curYear + '' + vm.curMonth + fullNum(i) < vm.opts.miny + '' + vm.opts.minm + vm.opts.mind){
+            disabled = true
+        }
+        else if(vm.curYear + '' + vm.curMonth + fullNum(i) > vm.opts.maxy + '' + vm.opts.maxm + vm.opts.maxd){
+            disabled = true
+        }
+
+        vm.dateList.push({
+            day: i >= 0 ? i + 1 : '',
+            disabled: disabled
+        })
+    }
+}
+
+function escape2Html(str) {
+   let arrEntities={'lt':'<','gt':'>','nbsp':' ','amp':'&','quot':'"'};
+   return str.replace(/&(lt|gt|nbsp|amp|quot);/ig,function(all,t){return arrEntities[t];});
+}
+
+
+function filterDate(date, format){
+    switch(format) {
+        case 'Y':
+            return new Date(date).getFullYear()
+            break;
+        case 'm':
+            return new Date(date).getMonth() + 1
+            break;
+        case 'd':
+            return new Date(date).getDate()
+            break;
+    }
+}
+
+class UiDatePicker{
 
     constructor(){
-        this.id = Date.now() + '_pages'
-        this.max = 5
-        this.total = 0
-        this.skin = 'blue'
+        this.curYear = curYear
+        this.curMonth = curMonth < 10 ? '0' + curMonth : curMonth
+        this.currDay = curDay
+        this.dateList = []
+        this.isShow = false
+        this.dateVal = ''
+        this.minDate = minDate
+        this.maxDate = maxDate
         this.msg = ''
-        this.curr = 1
-        this.showJumpBtn = false
-        this.callback = function(){}
+        this.opts = {}
     }
 
     checkFields(para, fields){
@@ -30,156 +101,203 @@ class UiPages{
     }
 
     init(parendId, config, callback){
+
         let parentDom = document.getElementById(parendId)
         if(!parentDom)
             return
+
+        if(config){
+            for(let it of Object.keys(config)){
+                if(this[it] || this[it] == 0){
+                    this[it] = config[it]
+                }
+            }
+        }
+
+        require('./datepicker.css')
+
         let container = document.createElement('div')
-        for(let it of Object.keys(config)){
-            if(it === 'skin' && !skin.includes(config[it]))
-                continue
-            if(this[it] || this[it] == 0){
-                this[it] = config[it]
-            }
-        }
-        container.className = ` ui-fn-noselect ui-pages ${this.skin}`
-        if(this.total > 0){
-            this.render(container, this.calculate(1))
-        }
-        parentDom.appendChild(container)
-        require('./pages.css')
+        container.className = ` ui-datepicker`
+        container.innerHTML = '<input type="text" class="date-input" /><dl class="date-dl" style="display: none;"><dt>请选择日期</dt><dd><nav class="ui-fn-cl date-nav" class="ui-fn-cl"><a href="javascript:;"><<</a><a href="javascript:;"><</a><span class="date-val">' + this.curYear + ' - ' + this.curMonth + '</span><a href="javascript:;">></a><a href="javascript:;">>></a></nav><ul><li class="ui-fn-cl"><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span><span>七</span></li><li class="msg" style="display: none;">' + this.msg + '</li><li class="ui-fn-cl date-list"></li></ul></dd></dl>'
 
-        this.callback = callback
         let _this = this
-        common.listenEvent(container, 'click', function(ev){
+        common.listenEvent(container.querySelector('.date-input'), 'click', function(ev){
+            _this.caculateDate(ev)
+        })
+
+        common.listenEvent(container.querySelector('.date-input'), 'focus', function(ev){
+            _this.show()
+        })
+
+        common.listenEvent(container.querySelector('.date-dl'), 'click', function(ev){
+            _this.keepShow(ev)
+        })
+
+        common.listenEvent(container.querySelector('.date-list'), 'click', function(ev){
             let target = ev.target
-            let curr = _this.curr
-            let total = _this.total
-            if(target.nodeName === 'SPAN' && target.innerHTML !== '...' && target.className !== 'jump'){
-
-                if(parseInt(target.innerHTML) > 0){curr = parseInt(target.innerHTML);}
-                if(target.innerHTML === '首页'){curr = 1}
-                if(target.innerHTML === '«' && curr > 1){curr = --curr}
-                if(target.innerHTML === '»' && curr < total){curr = ++curr}
-                if(target.innerHTML === '未页'){curr = total}
-
-                // console.log(curr, curr);
-                _this.jump(container, curr)
-            }
-
-            if(target.nodeName === 'SPAN' && target.className === 'jump'){
-                let txt = container.getElementsByTagName('input')[0].value
-                console.log(txt);
-                if(txt <= 0)
-                    return _this.msg = '页数必须大于0'
-                if(txt > total)
-                    return _this.msg = `最大页数是${total}`
-                if(txt % 1 !== 0)
-                    return _this.msg = `页数必须是整数`
-
-                _this.jump(container, txt)
-                container.getElementsByTagName('input')[0].value = txt
-
+            if(target.nodeName === 'SPAN'){
+                if(!target.className || target.className === 'disabled')
+                    return
+                container.querySelector('.date-input').value = _this.curYear + '-' + _this.curMonth + '-' + target.innerHTML
+                _this.dateVal = container.querySelector('.date-input').value
+                _this.render(container.querySelector('.date-list'))
+                callback && callback()
             }
         })
 
-        common.observable(this, 'msg', function(msg){
-            let span = document.createElement('span')
-            span.className = 'msg'
-            span.innerHTML = msg
-            container.appendChild(span)
+        common.listenEvent(container.querySelector('.date-nav'), 'click', function(ev){
+            let target = ev.target
+            if(target.nodeName === 'A'){
+                let text = escape2Html(target.innerHTML)
+                switch(text) {
+                    case '<<':
+                        _this.jump(1, -1)
+                        break;
+                    case '<':
+                        _this.jump(2, -1)
+                        break;
+                    case '>':
+                        _this.jump(2, 1)
+                        break;
+                    case '>>':
+                        _this.jump(1, 1)
+                        break;
+                }
+            }
+        })
+
+        common.listenEvent(document, 'click', function(){
+            _this.isShow = !1
+        })
+
+
+        this.opts = {
+            maxy: this.maxDate && filterDate(this.maxDate, 'Y'),
+            miny: this.minDate && filterDate(this.minDate, 'Y'),
+            maxm: this.maxDate && fullNum(filterDate(this.maxDate, 'm')),
+            minm: this.minDate && fullNum(filterDate(this.minDate, 'm')),
+            maxd: this.maxDate && fullNum(filterDate(this.maxDate, 'd')),
+            mind: this.minDate && fullNum(filterDate(this.minDate, 'd'))
+        }
+
+        calculate(this, this.curYear, this.curMonth)
+
+        this.render(container.querySelector('.date-list'))
+
+        parentDom.appendChild(container)
+
+        common.observable(_this, 'curYear',function(v){
+            if(monthChange)
+                return
+            calculate(_this, v, _this.curMonth)
+            container.querySelector('.date-val').innerHTML = _this.curYear + '-' + _this.curMonth
+        })
+
+        common.observable(_this, 'curMonth',function(v){
+            monthChange = true
             setTimeout(function(){
-                container.removeChild(span)
-            }, 1000)
+                calculate(_this, _this.curYear, v)
+                container.querySelector('.date-val').innerHTML = _this.curYear + '-' + _this.curMonth
+                monthChange = false
+            }, 0)
         })
 
+        common.observable(_this, 'dateList',function(v){
+            setTimeout(function(){
+                _this.render(container.querySelector('.date-list'))
+            }, 0)
+        })
 
+        common.observable(_this, 'msg',function(v){
+            if(!v)
+                return
+            container.querySelector('.msg').innerHTML = v
+            container.querySelector('.msg').style.display = 'block'
+            setTimeout(function(){
+                container.querySelector('.msg').style.display = 'none'
+                _this.msg = ''
+            },1000)
+        })
 
+        common.observable(this, 'isShow', function(v){
+            container.querySelector('.date-dl').style.display = v ? 'block' : 'none'
+        })
+
+    }
+
+    show(){
+        this.isShow = !0
+    }
+
+    keepShow(ev){
+        ev.stopPropagation && ev.stopPropagation() || (ev.cancelBubble = true)
+    }
+
+    caculateDate(ev){
+        ev.stopPropagation()
+    }
+
+    jump(type, step){
+        let year = this.curYear >> 0,
+            month = this.curMonth >> 0
+
+        if(type == 1){
+            year += step
+        }else if(type == 2){
+            month += step
+            if(month < 1){
+                year -= 1
+                month = 12
+            }else if(month > 12){
+                year += 1
+                month = 1
+            }
+        }
+
+        let time = new Date(year + '-' + month, curDay).getTime()
+        month = fullNum(month)
+
+        if((time < this.minDate || time > this.maxDate) || (year + '' + month < this.opts.miny + '' + this.opts.minm) || (year + '' + month > this.opts.maxy + '' + this.opts.maxm))
+            return this.msg = '超过日期限制'
+        if(month !== this.curMonth)
+            this.curMonth = month
+        if(year !== this.curYear)
+            this.curYear = year
+    }
+
+    getDate(v){
+        if(v && !v.disabled){
+            v = fullNum(v)
+            this.dateVal = this.curYear + '-' + this.curMonth + '-' + v.day
+        }
     }
 
 
     /**
      * [渲染dom结构]
      * @param  {Dom} container [页码容器]
-     * @param  {Array} pages      [返回dom字符串]
+     * @param  {Array} dates      [返回dom字符串]
      * @return {Dom}           [重新渲染dom结构]
      */
-    render(container, pages){
-        if(pages.length > 0 && container){
-            let dom = '<span class="first">首页</span><span>«</span>'
-
-            if(this.curr - Math.floor(this.max /2) > 1 && this.total > this.max)
-                dom += '<span>...</span>'
-
-            pages.map((v, i) => {
-                dom += v
-            })
-
-            if(this.total - this.curr > Math.floor(this.max /2) && this.total > this.max)
-                dom += '<span>...</span>'
-
-            dom += '<span>»</span><span class="last">未页</span>'
-
-            if(this.showJumpBtn)
-                dom += '<input type="text" class="txt" /><span class="jump" href="javascript:;">跳转</span>'
-
-            container.innerHTML = dom
-
-            let firstChild = container.firstChild
-            while (firstChild) {
-                if(firstChild.innerHTML == this.curr){
-                    firstChild.className = 'active'
-                }
-                firstChild = firstChild.nextSibling
+    render(container){
+        let dates = this.dateList
+        if(dates.length > 0 && container){
+            let dom = ''
+            let className = ''
+            for(let i = 0, len = dates.length;i < len;i++){
+                className = dates[i].disabled ? 'disabled' : 'act'
+                className += this.curYear + '-' + this.curMonth + '-' + dates[i].day == this.dateVal ? ' select' : ''
+                dom += '<span class="' + className + '">' + dates[i].day + '</span>'
             }
+            container.innerHTML = dom
+            // console.log(container);
         }
+
     }
 
-    /**
-     * [跳转]
-     * @param  {Dom} container [页码容器]
-     * @param  {Number} curr      [当前跳转页码]
-     * @return {Dom}           [重新渲染dom结构]
-     */
-    jump(container, curr){
-        if(curr < 1 || curr > this.total)
-            return
 
-        if(!(curr >> 0 > 0)){
-            this.msg = '页码不符合格式'
-        }
-        else if(curr > this.total){
-            this.msg = '页数不能超过' + this.total + '页'
-        }
 
-        this.curr = curr
-        this.render(container, this.calculate(curr))
-        this.callback && this.callback(curr)
-    }
-
-    /**
-     * [根据当前页码计算得出dom字符串]
-     * @param  {Number} curr [当前页码]
-     */
-    calculate(curr){
-
-        var dis = Math.floor(this.max / 2)
-        var start
-        if(this.total - curr < dis && this.total >= this.max)
-            start = this.total - (this.max - 1)
-        else if(curr - dis > 0 && this.total >= this.max)
-            start = curr - dis
-        else
-            start = 1
-
-        var end = start + (this.max - 1) < this.total ? start + (this.max - 1) : this.total
-        var pages = []
-        for(var i = 0,s = start,e = end;i<this.max;i++,s++){
-            if(s <= e)
-                pages[i] = `<span>${s}</span>`
-        }
-        return pages
-    }
 
 }
 
-export default UiPages
+export default UiDatePicker

@@ -79,7 +79,7 @@
 
         },
         mounted: function(){
-            require('@/components/fullscreen-scroll/main-es5.js')
+            // require('@/components/fullscreen-scroll/main-es5.js')
             var fullpage1 = new UiFullScreenScroll()
             fullpage1.init('fullPage', 'page', '.4')
             var fullpage2 = new UiFullScreenScroll()

@@ -47,7 +47,7 @@
 <script>
     import store from 'store'
     import vue from 'vue'
-    // import UiPages from '@/components/pages/main-es6.js'
+    import UiPages from '@/components/pages/main-es6.js'
 
     function showData(list, curr, num = 10){
         var start = (curr - 1) * num
@@ -110,7 +110,7 @@
             this.list = showData(arr, 1)
             this.list2 = showData(arr2, 1, 15)
             let _this = this
-            require('@/components/pages/main-es5.js')
+            // require('@/components/pages/main-es5.js')
             var pages = new UiPages()
             pages.init('pages', {
                 total: Math.ceil(arr.length / 10),

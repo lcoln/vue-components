@@ -19,7 +19,7 @@
 <script>
     import store from 'store'
     import vue from 'vue'
-    // import PointerHover from '@/components/pointer-hover-slider/main-es6.js'
+    import PointerHover from '@/components/pointer-hover-slider/main-es6.js'
 
     export default {
         name: 'app',
@@ -58,7 +58,7 @@
 
         },
         mounted: async function(){
-            require('@/components/pointer-hover-slider/main-es5.js')
+            // require('@/components/pointer-hover-slider/main-es5.js')
             var pointer = new UiPointerHover()
             pointer.init('pointer')
             var pointer2 = new UiPointerHover()
