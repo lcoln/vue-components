@@ -56,6 +56,7 @@ module.exports = {
         }else if(type === '[object Array]'){
             props = prop
         }
+
         for(var i = 0;i < props.length;i++){
             watch(obj, props[i], cb)
         }

@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="layer">
         <a href="javascript:;" @click="alert">alert</a>
         <a href="javascript:;" @click="confirm">confirm</a>
         <a href="javascript:;" @click="loading">loading</a>
@@ -19,16 +19,16 @@
         },
         methods: {
             alert () {
-                layer.alert('alert', {title: '提示'})
+                UiLayer.alert('alert', {title: '提示', callback: function(){console.log('test');}})
             },
             confirm () {
-                layer.confirm('confirm', {yes: function(){console.log('yes');}, no: function(){console.log('no');}})
+                UiLayer.confirm('confirm', {yes: function(){console.log('yes');}, no: function(){console.log('no');}})
             },
             loading () {
-                layer.loading({callback: function(){setTimeout(function(){layer.close()}, 3000)}})
+                UiLayer.loading({callback: function(){setTimeout(function(){UiLayer.close()}, 3000)}})
             },
             prompt () {
-                layer.prompt('<div>Are you a boy or a girl ?</div>',{
+                UiLayer.prompt('<div>Are you a boy or a girl ?</div>',{
                     title: 'prompt',
                     icon: 4,
                     yes: function(res){
@@ -42,8 +42,8 @@
         },
         mounted: function(){
             require('@/components/layer/main-es5.js')
-            layer = new UiLayer()
-            console.log(layer);
+            /*layer = UiLayer
+            console.log(UiLayer);*/
             /*var slider2 = new UiSliders()
             slider2.init('slider2', 'page', '.4')*/
             // console.log(fullpage2);
@@ -57,5 +57,5 @@
 </script>
 
 <style rel="stylesheet" lang="scss" type="text/css" scoped>
-
+    .layer a{display: inline-block;width: 100px;height: 30px;line-height: 30px;background: #f30;color: #fff;text-align: center;}
 </style>

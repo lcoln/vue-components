@@ -34,7 +34,7 @@ var watch = function(obj, prop, cb){
         },
         set: function(newVal){
             oldVal = newVal
-            cb && cb(newVal)
+            cb && cb(newVal, prop)
         }
     })
 }
@@ -55,6 +55,7 @@ var observable = function(obj, prop, cb){
     }else if(type === '[object Array]'){
         props = prop
     }
+
     for(var i = 0;i < props.length;i++){
         watch(obj, props[i], cb)
     }
@@ -79,7 +80,7 @@ window.UiPages = function (){
 
         var container = document.createElement('div')
         container.className = ` ui-fn-noselect ui-pages ${this.skin}`
-        
+
         if(this.total > 0){
             this.render(container, this.calculate(1))
         }

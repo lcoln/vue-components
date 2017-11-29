@@ -35,7 +35,7 @@ var watch = function(obj, prop, cb){
         },
         set: function(newVal){
             oldVal = newVal
-            cb && cb(newVal)
+            cb && cb(newVal, prop)
         }
     })
 }
@@ -77,10 +77,12 @@ function getLayerPosition(vm){
     setTimeout(function(){
         var vw,vh,x,y
         layer = document.getElementById('layer')
-        vw = window.innerWidth ? window.innerWidth : document.documentElement.clientWidth
-        vh = window.innerHeight ? window.innerHeight : document.documentElement.clientHeight
-        x = (vw - layer.offsetWidth) / 2
-        y = (vh - layer.offsetHeight) / 2
+        if(vm.type <= 3){
+            vw = window.innerWidth ? window.innerWidth : document.documentElement.clientWidth
+            vh = window.innerHeight ? window.innerHeight : document.documentElement.clientHeight
+            x = (vw - layer.offsetWidth) / 2
+            y = (vh - layer.offsetHeight) / 2
+        }
         layer.style.transform = 'translate(' + x + 'px,' + y + 'px)'
     }, 0)
 }
@@ -117,41 +119,83 @@ document.addEventListener('contextmenu',function(){
     offset = layer = null
 })
 
-window.UiLayer = function (){
+var Layer = function (){
     this.id = Date.now() + '_layer'
 }
-UiLayer.prototype = {
+Layer.prototype = {
     title: '提示',
     html: '',
     type: 5,
     layerId: '',
     $callback: {},
-    icon: '',
+    icon: '&#xe6af;',
     promptVal: '',
+    show: false,
     init: function(){
         var _this = this
 
-        if(!UiLayer.prototype.hasCss){
+        if(!Layer.prototype.hasCss){
             document.head.innerHTML += '<link rel="stylesheet" type="text/css" href="/static/css/layer/layer.css">'
         }
-        UiLayer.prototype.hasCss = true
+        Layer.prototype.hasCss = true
 
         var div = document.createElement('div')
 
-        div.innerHTML = '<div id="layer" class="ui-layer"><span class="ui-layer-title fn-noselect">'+ this.title +'<a class="ui-layer-close iconfont" href="javascript:;">✗</a></span><div class="ui-layer-content fn-noselect" id="layer-content"></div><div class="ui-layer-group-btn fn-noselect"><a href="javascript:;" class="ui-layer-btn ui-layer-yes">确定</a><a href="javascript:;" class="ui-layer-btn ui-layer-no">取消</a></div></div><div class="ui-layer-shade"></div><div class="ui-layer-loading"><span class="point point1"></span><span class="point point2"></span><span class="point point3"></span><span class="point point4"></span><span class="point point5"></span></div>'
-        console.log(div);
-        document.body.appendChild(div)
+        div.innerHTML = '<div id="layer" class="ui-layer"><i class="ui-layer-drag do-fn-noselect ui-layer-icon iconfont">' + this.icon + '</i><span class="ui-layer-drag ui-layer-title do-fn-noselect"><span class="ui-layer-title-text">' + this.html + '</span><a class="ui-layer-close iconfont" href="javascript:;">✗</a></span><div class="ui-layer-content do-fn-noselect" id="layer-content"><p class="ui-layer-content-html">' + this.html + '</p><input class="ui-layer-prompt-val" type="text" /></div><div class="ui-layer-group-btn do-fn-noselect"><a href="javascript:;" class="ui-layer-btn ui-layer-yes">确定</a><a href="javascript:;" class="ui-layer-btn ui-layer-no">取消</a></div></div><div class="ui-layer-shade"></div><div class="ui-layer-loading"><span class="point point1"></span><span class="point point2"></span><span class="point point3"></span><span class="point point4"></span><span class="point point5"></span></div>'
+
+        listenEvent(div.querySelector('.ui-layer-close'), 'click', function(){
+            _this.show = false
+        })
+
+        listenEvent(div.querySelector('.ui-layer-no'), 'click', function(){
+            _this.show = false
+            _this.$callback['no'] && _this.$callback['no']()
+        })
+
+        listenEvent(div.querySelector('.ui-layer-yes'), 'click', function(){
+            _this.yes()
+        })
+
+        listenEvent(div.querySelector('.ui-layer-prompt-val'), 'porpertychange', function(v){
+            _this.promptVal = div.querySelector('.ui-layer-prompt-val').value
+        })
+
+
+
+
 
         observable(this, 'type', function(v){
 
-            if(v <= 2){
+            if(v <= 3)
                 getLayerPosition(_this)
+
+        })
+
+        observable(this, ['title', 'html', 'icon', 'promptVal'], function(v, k){
+            if(k === 'title'){
+                div.querySelector('.ui-layer-title-text').innerHTML = v
+            }else if(k === 'html'){
+                div.querySelector('.ui-layer-content-html').innerHTML = v
+            }else if(k === 'icon'){
+                div.querySelector('.ui-layer-icon').innerHTML = v
             }
         })
 
-        observable(this, 'msg', function(v){
+        observable(this, 'show', function(v){
+            var type = _this.type
+            div.querySelector('.ui-layer-shade').style.display = v ? 'block' : 'none'
+            if(type <= 3){
+                div.querySelector('.ui-layer').style.display = v ? 'block' : 'none'
+                if(type == 3)
+                    div.querySelector('.ui-layer-prompt-val').style.display = v ? 'block' : 'none'
+            }
 
+            if(type == 4){
+                div.querySelector('.ui-layer-loading').style.display = v ? 'block' : 'none'
+            }
         })
+
+        document.body.appendChild(div)
 
         window.onresize = function(){
             getLayerPosition(_this)
@@ -161,9 +205,12 @@ UiLayer.prototype = {
 
     },
     yes: function(){
+        this.show = false
         if(this.$callback['yes']){
             if(this.promptVal){
                 this.$callback['yes'](this.promptVal)
+            }else{
+                this.$callback['yes']()
             }
         }
     },
@@ -172,7 +219,8 @@ UiLayer.prototype = {
         this.html = html
         this.$callback['no'] = opt.callback ? opt.callback : function(){}
         this.title = opt.title ? opt.title : '提示'
-        this.icon = opt.icon ? icon[opt.icon] : ''
+        this.icon = opt.icon ? icon[opt.icon] : '&#xe6af;'
+        this.show = true
     },
     confirm: function(html,opt){
         this.type = 2
@@ -180,7 +228,8 @@ UiLayer.prototype = {
         this.$callback['yes'] = opt.yes ? opt.yes : function(){}
         this.$callback['no'] = opt.no ? opt.no : function(){}
         this.title = opt.title ? opt.title : '提示'
-        this.icon = opt.icon ? icon[opt.icon] : ''
+        this.icon = opt.icon ? icon[opt.icon] : '&#xe6af;'
+        this.show = true
     },
     prompt: function(html, opt){
         this.type = 3
@@ -188,13 +237,16 @@ UiLayer.prototype = {
         this.$callback['yes'] = opt.yes ? opt.yes : function(){}
         this.$callback['no'] = opt.no ? opt.no : function(){}
         this.title = opt.title ? opt.title : '提示'
-        this.icon = opt.icon ? icon[opt.icon] : ''
+        this.icon = opt.icon ? icon[opt.icon] : '&#xe6af;'
+        this.show = true
     },
     loading: function(opt){
         this.type = 4
         this.$callback.callback = opt && opt.callback ? opt.callback : function(){}
+        this.show = true
     },
     close: function(ev){
+        this.show = false
         this.html = ''
         this.title = '提示'
         this.icon = '&#xe6af;'
@@ -208,6 +260,8 @@ UiLayer.prototype = {
     }
 }
 
-UiLayer.prototype.hasCss = false
+Layer.prototype.hasCss = false
 
-UiLayer.prototype.init()
+Layer.prototype.init()
+
+window.UiLayer = new Layer()
