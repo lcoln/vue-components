@@ -73,6 +73,9 @@
     <div class="waterfall-box"></div>
 </div>
 
+es5: <script src="https://components.cncoders.me/components/waterfall/main-es5.js"><\/script>
+es6: https://components.cncoders.me/components/waterfall/main-es6.js //import UiWaterFall from 'path/to/waterfall/main-es6.js'
+
 <script>
     window.onload = function(){
         var waterfall = new WaterFall()

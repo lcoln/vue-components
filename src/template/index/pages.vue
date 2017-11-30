@@ -70,6 +70,10 @@
                 code: `
 <div id="pages"></div>
 <div id="pages2"></div>
+
+es5: <script src="https://components.cncoders.me/components/pages/main-es5.js"><\/script>
+es6: https://components.cncoders.me/components/pages/main-es6.js //import UiPages from 'path/to/pages/main-es6.js'
+
 <script type="text/javascript">
     var pages = new UiPages()
     pages.init('pages', {

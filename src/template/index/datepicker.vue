@@ -21,7 +21,25 @@
         name: 'app',
         data () {
             return {
-                code: ``
+                code: `
+<div id="datePicker" style="display: inline-block;"></div>
+<div id="datePicker2" style="display: inline-block;vertical-align: top;"></div>
+
+es5: <script src="https://components.cncoders.me/components/datepicker/main-es5.js"><\/script>
+es6: https://components.cncoders.me/components/datepicker/main-es6.js // import UiDatePicker from 'path/to/datepicker/main-es6.js'
+
+var datePicker = new UiDatePicker()
+datePicker.init('datePicker', {
+    maxDate: Date.now() + 240 * 60 * 60 * 24 * 1000,
+    minDate: Date.now() - 240 * 60 * 60 * 24 * 1000
+})
+
+var datePicker2 = new UiDatePicker()
+datePicker2.init('datePicker2', {
+    maxDate: Date.now() + 240 * 60 * 60 * 24 * 1000,
+    minDate: Date.now() - 240 * 60 * 60 * 24 * 1000
+})
+`
             }
         },
         methods: {

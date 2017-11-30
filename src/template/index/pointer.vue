@@ -19,7 +19,7 @@
 <script>
     import store from 'store'
     import vue from 'vue'
-    import PointerHover from '@/components/pointer-hover-slider/main-es6.js'
+    import UiPointerHover from '@/components/pointer-hover-slider/main-es6.js'
 
     export default {
         name: 'app',
@@ -35,11 +35,14 @@
     </div>
 </div>
 
+es5: <script src="https://components.cncoders.me/components/pointer-hover-slider/main-es5.js"><\/script>
+es6: https://components.cncoders.me/components/pointer-hover-slider/main-es6.js //import UiPointerHover from 'path/to/pointer-hover-slider/main-es6.js'
+
 <script>
-    var pointer = new PointerHover()
+    var pointer = new UiPointerHover()
     console.log(pointer);
     pointer.init('pointer')
-    var pointer2 = new PointerHover()
+    var pointer2 = new UiPointerHover()
     pointer2.init('pointer2')
 <\/script>
 

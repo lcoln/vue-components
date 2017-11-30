@@ -76,7 +76,7 @@ var layer = null,
 function getLayerPosition(vm){
     setTimeout(function(){
         var vw,vh,x,y
-        layer = document.getElementById('layer')
+        layer = document.getElementById('UiLayer')
         if(vm.type <= 3){
             vw = window.innerWidth ? window.innerWidth : document.documentElement.clientWidth
             vh = window.innerHeight ? window.innerHeight : document.documentElement.clientHeight
@@ -141,22 +141,22 @@ Layer.prototype = {
 
         var div = document.createElement('div')
 
-        div.innerHTML = '<div id="layer" class="ui-layer"><i class="ui-layer-drag do-fn-noselect ui-layer-icon iconfont">' + this.icon + '</i><span class="ui-layer-drag ui-layer-title do-fn-noselect"><span class="ui-layer-title-text">' + this.html + '</span><a class="ui-layer-close iconfont" href="javascript:;">✗</a></span><div class="ui-layer-content do-fn-noselect" id="layer-content"><p class="ui-layer-content-html">' + this.html + '</p><input class="ui-layer-prompt-val" type="text" /></div><div class="ui-layer-group-btn do-fn-noselect"><a href="javascript:;" class="ui-layer-btn ui-layer-yes">确定</a><a href="javascript:;" class="ui-layer-btn ui-layer-no">取消</a></div></div><div class="ui-layer-shade"></div><div class="ui-layer-loading"><span class="point point1"></span><span class="point point2"></span><span class="point point3"></span><span class="point point4"></span><span class="point point5"></span></div>'
+        div.innerHTML = '<div id="UiLayer" class="ui-layer"><i class="ui-layer-drag ui-fn-noselect ui-layer-icon iconfont">' + this.icon + '</i><span class="ui-layer-drag ui-layer-title ui-fn-noselect"><span class="ui-layer-title-text">' + this.html + '</span><a class="ui-layer-close iconfont" href="javascript:;">✗</a></span><div class="ui-layer-content ui-fn-noselect"><p class="ui-layer-content-html">' + this.html + '</p><input class="ui-layer-prompt-val" type="text" /></div><div class="ui-layer-group-btn ui-fn-noselect"><a href="javascript:;" class="ui-layer-btn ui-layer-yes">确定</a><a href="javascript:;" class="ui-layer-btn ui-layer-no">取消</a></div></div><div class="ui-layer-shade"></div><div class="ui-layer-loading"><span class="point point1"></span><span class="point point2"></span><span class="point point3"></span><span class="point point4"></span><span class="point point5"></span></div>'
 
         listenEvent(div.querySelector('.ui-layer-close'), 'click', function(){
-            _this.show = false
+            _this.close()
         })
 
         listenEvent(div.querySelector('.ui-layer-no'), 'click', function(){
-            _this.show = false
             _this.$callback['no'] && _this.$callback['no']()
+            _this.close()
         })
 
         listenEvent(div.querySelector('.ui-layer-yes'), 'click', function(){
             _this.yes()
         })
 
-        listenEvent(div.querySelector('.ui-layer-prompt-val'), 'porpertychange', function(v){
+        listenEvent(div.querySelector('.ui-layer-prompt-val'), 'change', function(v){
             _this.promptVal = div.querySelector('.ui-layer-prompt-val').value
         })
 
@@ -178,6 +178,8 @@ Layer.prototype = {
                 div.querySelector('.ui-layer-content-html').innerHTML = v
             }else if(k === 'icon'){
                 div.querySelector('.ui-layer-icon').innerHTML = v
+            }else if(k === 'promptVal'){
+                div.querySelector('.ui-layer-prompt-val').value = v
             }
         })
 
@@ -209,6 +211,7 @@ Layer.prototype = {
         if(this.$callback['yes']){
             if(this.promptVal){
                 this.$callback['yes'](this.promptVal)
+                this.promptVal = ''
             }else{
                 this.$callback['yes']()
             }

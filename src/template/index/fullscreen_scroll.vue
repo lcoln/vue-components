@@ -48,6 +48,9 @@
     <div class="page"></div>
 </div>
 
+es5: <script src="https://components.cncoders.me/components/fullscreen-scroll/main-es5.js"><\/script>
+es6: https://components.cncoders.me/components/fullscreen-scroll/main-es6.js //import UiPages from 'path/to/fullscreen-scroll/main-es6.js'
+
 <script>
     var fullpage = new UiFullScreenScroll()
     fullpage.init('fullPage', 'page', '.4')
