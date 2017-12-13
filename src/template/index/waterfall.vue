@@ -14,19 +14,12 @@
                 <div class="waterfall-box"></div>
                 <div class="waterfall-box"></div>
             </div>
-            <div id="waterfall1">
+            <!-- <div id="waterfall1">
                 <div class="waterfall-box"></div>
                 <div class="waterfall-box"></div>
                 <div class="waterfall-box"></div>
                 <div class="waterfall-box"></div>
-                <div class="waterfall-box"></div>
-                <div class="waterfall-box"></div>
-                <div class="waterfall-box"></div>
-                <div class="waterfall-box"></div>
-                <div class="waterfall-box"></div>
-                <div class="waterfall-box"></div>
-                <div class="waterfall-box"></div>
-            </div>
+            </div> -->
         </div>
         <pre class="code" v-if="showType == 2" v-text="code">
             <code class="html">
@@ -51,22 +44,8 @@
     <div class="waterfall-box"></div>
     <div class="waterfall-box"></div>
     <div class="waterfall-box"></div>
-    <div class="waterfall-box"></div>
-    <div class="waterfall-box"></div>
-    <div class="waterfall-box"></div>
-    <div class="waterfall-box"></div>
-    <div class="waterfall-box"></div>
-    <div class="waterfall-box"></div>
-    <div class="waterfall-box"></div>
 </div>
 <div id="waterfall1">
-    <div class="waterfall-box"></div>
-    <div class="waterfall-box"></div>
-    <div class="waterfall-box"></div>
-    <div class="waterfall-box"></div>
-    <div class="waterfall-box"></div>
-    <div class="waterfall-box"></div>
-    <div class="waterfall-box"></div>
     <div class="waterfall-box"></div>
     <div class="waterfall-box"></div>
     <div class="waterfall-box"></div>
@@ -100,10 +79,10 @@ es6: https://components.cncoders.me/components/waterfall/main-es6.js //import Ui
         mounted: async function(){
             // require('@/components/waterfall/main-es5.js')
             var waterfall = new UiWaterFall()
-            console.log(waterfall);
+            // console.log(waterfall);
             waterfall.init('waterfall', 'waterfall-box', {width: 200, range: [300, 400]})
-            var waterfall1 = new UiWaterFall()
-            waterfall1.init('waterfall1', 'waterfall-box', {width: 200, range: [300, 400]})
+            /*var waterfall1 = new UiWaterFall()
+            waterfall1.init('waterfall1', 'waterfall-box', {width: 200, range: [300, 400]})*/
         },
         computed: {
             showType () {

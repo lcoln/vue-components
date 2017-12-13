@@ -48,6 +48,7 @@ datePicker2.init('datePicker2', {
         mounted: async function(){
             // require('@/components/datepicker/main-es5.js')
             var datePicker = new UiDatePicker()
+            console.log(datePicker.init);
             datePicker.init('datePicker', {
                 maxDate: Date.now() + 240 * 60 * 60 * 24 * 1000,
                 minDate: Date.now() - 240 * 60 * 60 * 24 * 1000
