@@ -32,7 +32,7 @@
 <script>
     import store from 'store'
     import vue from 'vue'
-    import UiWaterFall from '@/components/waterfall/main-es6.js'
+    // import UiWaterFall from '@/components/waterfall/main-es6.js'
 
     export default {
         name: 'app',
@@ -77,10 +77,10 @@ es6: https://components.cncoders.me/components/waterfall/main-es6.js //import Ui
 
         },
         mounted: async function(){
-            // require('@/components/waterfall/main-es5.js')
+            require('@/components/waterfall/main-es5.js')
             var waterfall = new UiWaterFall()
             // console.log(waterfall);
-            waterfall.init('waterfall', 'waterfall-box', {width: 200, range: [300, 400]})
+            waterfall.init('waterfall', 'waterfall-box')
             /*var waterfall1 = new UiWaterFall()
             waterfall1.init('waterfall1', 'waterfall-box', {width: 200, range: [300, 400]})*/
         },

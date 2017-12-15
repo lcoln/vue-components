@@ -66,20 +66,11 @@ class UiWaterFall{
             let top = 0
             let left = boxw * (i % maxColumLen) + 'px'
 
-            /*if(i + 1 > maxColumLen){
-                if(i - maxColumLen < maxColumLen){
-                    top = box[i - maxColumLen].offsetHeight + margin + 'px'
-                }else{
-                    let curBox = box[i - maxColumLen]
-                    top = (curBox.style.transform.split(',')[1].replace('px)', '') >> 0) + curBox.offsetHeight + margin + 'px'
-                }
-            }*/
             let boxh = parseFloat(box[i].style.height.slice(0, -2))
 
             if(column.length < maxColumLen){
                 column.push(boxh)
             }else{
-                console.log(column);
                 let tmpColumn = JSON.parse(JSON.stringify(column))
                 let index = tmpColumn.indexOf(column.sort(function(a, b){return a - b})[0])
                 tmpColumn[index] += boxh + margin
@@ -90,7 +81,6 @@ class UiWaterFall{
 
             box[i].style.cssText += `transform: translate(${left},${top})`
         }
-        // console.log(column);
     }
 
 
