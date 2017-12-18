@@ -84,6 +84,7 @@ es6: https://components.cncoders.me/components/fullscreen-scroll/main-es6.js //i
         mounted: function(){
             // require('@/components/fullscreen-scroll/main-es5.js')
             var fullpage1 = new UiFullScreenScroll()
+            // console.log(fullpage1);
             fullpage1.init('fullPage', 'page', '.4')
             var fullpage2 = new UiFullScreenScroll()
             fullpage2.init('fullPage2', 'page', '.4')

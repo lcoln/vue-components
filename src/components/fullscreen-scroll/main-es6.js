@@ -27,7 +27,7 @@ class UiFullScreenScroll{
 
         var childDom = parentDom.querySelectorAll('.' + childId)
         var container = document.createElement('section')
-        var btnGroup = document.createElement('section')
+        var btnGroup = container.cloneNode(false)
 
         var span = document.createElement('span')
         var frag = document.createDocumentFragment()
@@ -36,7 +36,7 @@ class UiFullScreenScroll{
         for(var i = 0;i < childDom.length;i++){
             container.appendChild(childDom[i])
             var btn = span.cloneNode(false)
-            btn.setAttribute('style', 'display: inline-block;width: 10px;height: 10px;border-radius: 100%;background: rgba(255,255,255,.6);transition: .4s;')
+            btn.style.cssText = 'display: inline-block;width: 10px;height: 10px;border-radius: 100%;background: rgba(255,255,255,.6);transition: .4s;'
             if(i == 0){
                 btn.style.background = '#f30'
                 btn.style.transform = 'scale(1.5)'
@@ -50,12 +50,11 @@ class UiFullScreenScroll{
             frag.appendChild(btn)
         }
         btnGroup.appendChild(frag)
-        btnGroup.setAttribute('style', 'position: absolute;right: 10px;top: 50%;width: 10px;text-align: center;transform: translate(0, -50%);transition: '+ transition +' ')
+        btnGroup.style.cssText = 'position: absolute;right: 10px;top: 50%;width: 10px;text-align: center;transform: translate(0, -50%);transition: '+ transition +';'
         btnGroup.id = 'ui-fullpage-btn-' + this.id
 
-        container.style.width = '100%'
-        container.style.height = '100%'
-        container.style.transition = time.indexOf('s') < 0 ? time + 's' : time
+
+        container.style.cssText = 'width: 100%;height: 100%;transition: ' + transition + ';'
         container.id = 'pageName-' + this.id
 
 
@@ -97,7 +96,6 @@ class UiFullScreenScroll{
         })
         common.listenEvent(window, 'resize', function(){
 
-            container.style.transition = '0s'
             container.style.transform = 'translate(0px, ' + -UiFullScreenScroll.curHeight(_this.el) * _this.curPage + 'px)'
             setTimeout(function(){
                 container.style.transition = time.indexOf('s') < 0 ? time + 's' : time

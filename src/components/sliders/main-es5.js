@@ -199,6 +199,7 @@ UiSliders.prototype = {
         }
     },
     init: function(parendId, config, callback){
+        console.log(config);
         var parentDom = document.getElementById(parendId)
         if(!parentDom)
             return
@@ -211,6 +212,11 @@ UiSliders.prototype = {
                 this[it] = config[it]
             }
         }
+
+        if(!UiSliders.prototype.hasCss){
+            document.head.innerHTML += '<link rel="stylesheet" type="text/css" href="/static/css/sliders/main.css">'
+        }
+        UiSliders.prototype.hasCss = true
 
         var container = document.createElement('div')
         container.className = ` ui-sliders`
@@ -234,6 +240,7 @@ UiSliders.prototype = {
         this.skin = skin[this.skin]
         box.className += this.skin
         this.currWidth = (100 / this.sliderList.length)
+        console.log(this.autoSlide);
         if(this.autoSlide)
             autoSlide(this)
 
@@ -290,4 +297,6 @@ UiSliders.prototype = {
 
     }
 }
+
+UiSliders.prototype.hasCss = false
 

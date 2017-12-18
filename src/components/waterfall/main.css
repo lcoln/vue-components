@@ -1,0 +1,12 @@
+@charset "UTF-8";
+/**
+ *
+ * @authors Lincoln (875482941@qq.com)
+ * @date    2017-01-13 13:53:48
+ * @version $Id$
+ */
+
+*{outline: none;}
+
+.ui-waterfall{height: 100%;margin: 0 auto;}
+/*.ui-waterfall .waterfall-box{width: 230px;}*/

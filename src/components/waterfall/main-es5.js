@@ -65,7 +65,7 @@ var observable = function(obj, prop, cb){
 
 
 window.UiWaterFall = function (){
-    this.id = Date.now() + '_waterfall'
+
 }
 UiWaterFall.prototype = {
     id: Date.now() + '_waterfall',
@@ -92,8 +92,10 @@ UiWaterFall.prototype.init = function(parendId, childId, config){
     var margin = this.config.margin
     var width = this.config.width
 
-    var frag = document.createDocumentFragment()
-    for(var i = 0, len = childDom.length;i < len;i++){
+    var frag = document.createDocumentFragment(),
+        i = 0,
+        len = childDom.length
+    for(;i < len;i++){
         childDom[i].style.cssText = 'position: absolute;width: ' + width + 'px;height: ' + (Math.random() * (rangeh[1] - rangeh[0]) + rangeh[0]) + 'px;margin: ' + margin + 'px;transition: .4s;'
         frag.appendChild(childDom[i])
     }
@@ -108,8 +110,6 @@ UiWaterFall.prototype.init = function(parendId, childId, config){
 
     var _this = this
     listenEvent(window, 'resize', function(){
-        var parentDom = document.getElementById(parendId),
-            childDom = parentDom.querySelectorAll('.' + childId)
 
         _this.setContainerWidth(parentDom, childDom, container).setPosition(parentDom, childDom)
     })
@@ -120,8 +120,10 @@ UiWaterFall.prototype.setPosition = function(container, box){
         return
     var margin = this.config.margin
 
-    var column = []
-    for(var i = 0;i < box.length;i++){
+    var column = [],
+        i = 0,
+        len = box.length
+    for(;i < len;i++){
 
         var top = 0
         var left = this.boxw * (i % this.maxColumLen) + 'px'
@@ -139,7 +141,7 @@ UiWaterFall.prototype.setPosition = function(container, box){
             column = tmpColumn
         }
 
-        box[i].style.cssText += `transform: translate(${left},${top});text-align: center;`
+        box[i].style.cssText += 'transform: translate(' + left + ',' + top + ');'
     }
 }
 

@@ -12,75 +12,91 @@ class UiWaterFall{
 
     constructor(){
         this.id = Date.now() + '_waterfall'
+        this.config = {}
     }
 
     init(parendId, childId, config){
+        var parentDom = document.getElementById(parendId),
+            childDom = parentDom.querySelectorAll('.' + childId)
 
-        let parentDom = document.getElementById(parendId),
-            childDom = parentDom ? parentDom.querySelectorAll('.' + childId) : null
-        if(!parentDom || !childDom)
-            return common.removeListenEvent(window, 'resize', resizeEvent)
+        require('./main.css')
 
-        if(Object.prototype.toString.call(config) !== '[object Object]')
-            console.error('第三个参数须为对象');
-
-        let rangeh = config.range
-
-        for(let it of childDom){
-            it.style.width = config.width + 'px'
-            it.style.height = Math.random() * (rangeh[1] - rangeh[0]) + rangeh[0] + 'px'
-            it.style.position = 'absolute'
-            it.style.margin = config.distance || '5px'
-            it.style.transition = '.4s'
+        config = config || {}
+        this.config = {
+            margin: config.margin || 5,
+            range: config.range && config.range.length ? config.range : [300, 400],
+            width: config.width || 200
         }
 
-        this.setPosition(parentDom, childDom)
+        var rangeh = this.config.range
+        var margin = this.config.margin
+        var width = this.config.width
 
-        let _this = this
-        let resizeEvent = function(){
-            let parentDom = document.getElementById(parendId),
-                childDom = parentDom ? parentDom.querySelectorAll('.' + childId) : null
-
-            _this.setPosition(parentDom, childDom)
+        var frag = document.createDocumentFragment(),
+            i = 0,
+            len = childDom.length
+        for(;i < len;i++){
+            childDom[i].style.cssText = 'position: absolute;width: ' + width + 'px;height: ' + (Math.random() * (rangeh[1] - rangeh[0]) + rangeh[0]) + 'px;margin: ' + margin + 'px;transition: .4s;'
+            frag.appendChild(childDom[i])
         }
 
-        common.listenEvent(window, 'resize', resizeEvent)
+        var container = document.createElement('section')
+        container.className = 'ui-waterfall'
+        container.appendChild(frag)
+
+        this.setContainerWidth(parentDom, childDom, container).setPosition(parentDom, childDom)
+
+        parentDom.appendChild(container)
+
+        var _this = this
+        common.listenEvent(window, 'resize', function(){
+
+            _this.setContainerWidth(parentDom, childDom, container).setPosition(parentDom, childDom)
+        })
     }
 
     setPosition(container, box){
         if(!container || !box)
             return
-        let containerw = container.offsetWidth
-        let boxMarginLeft = box[0].style.marginLeft.replace('px', '') >> 0
-        let boxMarginRight = box[0].style.marginRight.replace('px', '') >> 0
-        let boxMarginTop = box[0].style.marginTop.replace('px', '') >> 0
-        let boxMarginBottom = box[0].style.marginBottom.replace('px', '') >> 0
+        var margin = this.config.margin
 
-        let boxw = box[0].offsetWidth + boxMarginLeft + boxMarginRight
-        let maxColumLen = Math.floor(containerw / boxw)
+        var column = [],
+            i = 0,
+            len = box.length
+        for(;i < len;i++){
 
-        let column = []
-        for(let i = 0;i < box.length;i++){
-            let margin = boxMarginTop + boxMarginBottom
+            var top = 0
+            var left = this.boxw * (i % this.maxColumLen) + 'px'
 
-            let top = 0
-            let left = boxw * (i % maxColumLen) + 'px'
+            var boxh = parseFloat(box[i].style.height.slice(0, -2))
 
-            let boxh = parseFloat(box[i].style.height.slice(0, -2))
-
-            if(column.length < maxColumLen){
+            if(column.length < this.maxColumLen){
                 column.push(boxh)
             }else{
-                let tmpColumn = JSON.parse(JSON.stringify(column))
-                let index = tmpColumn.indexOf(column.sort(function(a, b){return a - b})[0])
+                var tmpColumn = JSON.parse(JSON.stringify(column))
+                var index = tmpColumn.indexOf(column.sort(function(a, b){return a - b})[0])
                 tmpColumn[index] += boxh + margin
-                left = boxw * index + 'px'
+                left = this.boxw * index + 'px'
                 top = column[0] + margin + 'px'
                 column = tmpColumn
             }
 
-            box[i].style.cssText += `transform: translate(${left},${top})`
+            box[i].style.cssText += `transform: translate(${left},${top});`
         }
+    }
+
+    setContainerWidth(parentDom, childDom, container){
+        var containerw = parentDom.offsetWidth
+        var boxMarginLeft = childDom[0].style.marginLeft.replace('px', '') >> 0
+        var boxMarginRight = childDom[0].style.marginRight.replace('px', '') >> 0
+        this.boxw = (childDom[0].style.width.slice(0, -2) >> 0) + boxMarginLeft + boxMarginRight
+        this.maxColumLen = Math.floor(containerw / this.boxw)
+
+
+        var w = this.maxColumLen * (this.config.width + this.config.margin * 2)
+        container.style.cssText = 'width: ' + w + 'px;'
+        return this
+
     }
 
 
