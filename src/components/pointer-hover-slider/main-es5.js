@@ -66,27 +66,23 @@ window.UiPointerHover = function (parendId, childId, time){
 
 }
 
-UiPointerHover.prototype.init = function(elm, opt){
-    if(Object.prototype.toString.call(opt) !== '[object Object]')
-        opt = {}
-    opt.angle = opt.angle ? opt.angle.replace('deg', '') : 10
-    opt.shadow = opt.shadow ? opt.shadow : '0 10px 30px rgba(0, 0, 0, .4)'
+UiPointerHover.prototype.init = function(elm, opts){
+    if(Object.prototype.toString.call(opts) !== '[object Object]')
+        opts = {}
+    opts.angle = opts.angle ? opts.angle.replace('deg', '') : 10
+    opts.shadow = opts.shadow ? opts.shadow : '0 10px 30px rgba(0, 0, 0, .4)'
 
     var parentDom = document.getElementById(elm)
-    parentDom.style.perspective = '800px'
-    parentDom.style['transform-style'] = 'preserve-3d'
-    parentDom.style.background = ''
+    parentDom.style.cssText = 'background: none;perspective: 800px;transform-style: preserve-3d;'
 
 
     var container = document.createElement('section')
-    container.style.perspective = '800px'
-    container.style['transform-style'] = 'preserve-3d'
-    container.style.width = '100%'
-    container.style.height = '100%'
-    container.style.transition = '.3s'
+    container.style.cssText = 'width: 100%;height: 100%;transform-style: preserve-3d;perspective: 800px;transition: .3s;'
 
-    for(let i = 0;i < parentDom.children.length;i++){
-        container.appendChild(parentDom.children[i])
+    var i = 0, len = parentDom.children.length
+
+    for(;i < len;){
+        container.appendChild(parentDom.children[i++])
     }
 
     parentDom.appendChild(container)
@@ -94,11 +90,15 @@ UiPointerHover.prototype.init = function(elm, opt){
     var curHeight = (window.getComputedStyle ? (window.getComputedStyle(parentDom).height).replace('px', '') : parentDom.offsetHeight) >> 0
     var curWidth = (window.getComputedStyle ? (window.getComputedStyle(parentDom).width).replace('px', '') : parentDom.offsetWidth) >> 0
 
+    //当前元素的一半的宽与高
     var halfh = curHeight / 2
     var halfw = curWidth / 2
 
-    var moveh = opt.angle / curHeight
-    var movew = opt.angle / curWidth
+    //垂直与水平方向移动时平均应该改变的角度值
+    var moveh = opts.angle / curHeight
+    var movew = opts.angle / curWidth
+
+    //最终应该改变的角度值
     var movex = 0
     var movey = 0
 
@@ -106,17 +106,17 @@ UiPointerHover.prototype.init = function(elm, opt){
 
         movey = ev.offsetX
         if(movey < halfw){
-            movey = -(halfw - movey) / halfw * opt.angle
+            movey = -(halfw - movey) / halfw * opts.angle
         }else if(movey >= halfw){
-            movey = (movey - halfw) / halfw * opt.angle
+            movey = (movey - halfw) / halfw * opts.angle
         }
 
         movex = ev.offsetY
-
+        //如果在重心以上，水平的角度则为 (一半高度-移动距离) * 平均应该改变的角度值
         if(movex < halfh){
-            movex = (halfh - movex) / halfh * opt.angle
+            movex = (halfh - movex) * moveh
         }else if(movex >= halfh){
-            movex = -(movex - halfh) / halfh * opt.angle
+            movex = -(movex - halfh) * movew
         }
 
         container.style.transform = 'rotateX(' + movex + 'deg) rotateY(' + movey + 'deg)'
@@ -124,7 +124,7 @@ UiPointerHover.prototype.init = function(elm, opt){
     })
 
     listen(parentDom, 'mouseenter', function(){
-        container.style['box-shadow'] = opt.shadow
+        container.style['box-shadow'] = opts.shadow
     })
 
     listen(parentDom, 'mouseleave', function(){

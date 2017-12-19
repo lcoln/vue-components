@@ -21,14 +21,6 @@ class UiPages{
         this.callback = function(){}
     }
 
-    checkFields(para, fields){
-        for(let it of fields){
-            if(!para[it] && para[it] != 0)
-                return it
-        }
-        return true
-    }
-
     init(parendId, config, callback){
         let parentDom = document.getElementById(parendId)
         if(!parentDom)
@@ -62,7 +54,6 @@ class UiPages{
                 if(target.innerHTML === '»' && curr < total){curr = ++curr}
                 if(target.innerHTML === '未页'){curr = total}
 
-                // console.log(curr, curr);
                 _this.jump(container, curr)
             }
 
@@ -131,6 +122,7 @@ class UiPages{
                 }
                 firstChild = firstChild.nextSibling
             }
+            dom = container = null
         }
     }
 
@@ -154,6 +146,7 @@ class UiPages{
         this.curr = curr
         this.render(container, this.calculate(curr))
         this.callback && this.callback(curr)
+        container = curr = null
     }
 
     /**
@@ -173,10 +166,11 @@ class UiPages{
 
         var end = start + (this.max - 1) < this.total ? start + (this.max - 1) : this.total
         var pages = []
-        for(var i = 0,s = start,e = end;i<this.max;i++,s++){
-            if(s <= e)
-                pages[i] = `<span>${s}</span>`
+        for(var i = 0;i < this.max;){
+            if(start <= end)
+                pages[i++] = `<span>${start++}</span>`
         }
+        dis = start = end = null
         return pages
     }
 

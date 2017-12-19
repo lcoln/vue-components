@@ -8,76 +8,214 @@
 
 import * as common from "common";
 
-class UiWaterFall{
+
+var layer = null,
+    offset = [],
+    icon = {
+        1: '&#xe6af;',      //笑脸
+        2: '&#xe69c;',      //哭脸
+        3: '&#xe6a4;',      //感叹号
+        4: '&#xe6a3;',      //问号
+        5: '&#xe6a0;',      //星星
+        6: '&#xe6b1;'       //成功
+    }
+
+function getLayerPosition(vm){
+    setTimeout(function(){
+        var vw,vh,x,y
+        layer = document.getElementById('UiLayer')
+        if(vm.type <= 3){
+            vw = window.innerWidth ? window.innerWidth : document.documentElement.clientWidth
+            vh = window.innerHeight ? window.innerHeight : document.documentElement.clientHeight
+            x = (vw - layer.offsetWidth) / 2
+            y = (vh - layer.offsetHeight) / 2
+        }
+        layer.style.transform = 'translate(' + x + 'px,' + y + 'px)'
+    }, 0)
+}
+
+function move(ev){
+    if(ev.type != 'contextmenu'){
+        var mx = ev.pageX - layer.getAttribute('ox')
+        var my = ev.pageY - layer.getAttribute('oy')
+        var curLeft = mx + (offset[0] >> 0)
+        var curTop = my + (offset[1] >> 0)
+        layer.style.transform = 'translate(' + curLeft + 'px,' + curTop + 'px)'
+    }
+}
+
+document.addEventListener('mousedown',function(ev){
+    if(ev.type != 'contextmenu'){
+        layer = ev.target.offsetParent
+        if(layer && /ui-layer-title/.test(ev.target.className)){
+            offset = layer.style.transform.replace(/[^\d,.]/g,'').split(',')
+            layer.setAttribute('ox', ev.pageX)
+            layer.setAttribute('oy', ev.pageY)
+            document.addEventListener('mousemove',move)
+        }
+    }
+})
+
+document.addEventListener('mouseup',function(){
+    document.removeEventListener('mousemove',move)
+    offset = layer = null
+})
+
+document.addEventListener('contextmenu',function(){
+    document.removeEventListener('mousemove',move)
+    offset = layer = null
+})
+
+class Layer{
 
     constructor(){
-        this.id = Date.now() + '_waterfall'
+        this.id = Date.now() + '_Layer'
+        this.title = '提示'
+        this.html = ''
+        this.type = 5
+        this.layerId = ''
+        this.$callback = {}
+        this.icon = '&#xe6af;'
+        this.promptVal = ''
+        this.show = false
     }
 
-    init(parendId, childId, config){
+    init(){
+        var _this = this
 
-        let parentDom = document.getElementById(parendId),
-            childDom = parentDom ? parentDom.querySelectorAll('.' + childId) : null
-        if(!parentDom || !childDom)
-            return common.removeListenEvent(window, 'resize', resizeEvent)
+        var div = document.createElement('div')
 
-        if(Object.prototype.toString.call(config) !== '[object Object]')
-            console.error('第三个参数须为对象');
+        div.innerHTML = '<div id="UiLayer" class="ui-layer"><i class="ui-layer-drag ui-fn-noselect ui-layer-icon iconfont">' + this.icon + '</i><span class="ui-layer-drag ui-layer-title ui-fn-noselect"><span class="ui-layer-title-text">' + this.html + '</span><a class="ui-layer-close iconfont" href="javascript:;">✗</a></span><div class="ui-layer-content ui-fn-noselect"><p class="ui-layer-content-html">' + this.html + '</p><input class="ui-layer-prompt-val" type="text" /></div><div class="ui-layer-group-btn ui-fn-noselect"><a href="javascript:;" class="ui-layer-btn ui-layer-yes">确定</a><a href="javascript:;" class="ui-layer-btn ui-layer-no">取消</a></div></div><div class="ui-layer-shade"></div><div class="ui-layer-loading"><span class="point point1"></span><span class="point point2"></span><span class="point point3"></span><span class="point point4"></span><span class="point point5"></span></div>'
 
-        let rangeh = config.range
+        require('./main.css')
 
-        for(let it of childDom){
-            it.style.width = config.width + 'px'
-            it.style.height = Math.random() * (rangeh[1] - rangeh[0]) + rangeh[0] + 'px'
-            it.style.position = 'absolute'
-            it.style.margin = config.distance || '5px'
-            it.style.transition = '.4s'
-        }
+        common.listenEvent(div.querySelector('.ui-layer-close'), 'click', function(){
+            _this.close()
+        })
 
-        this.setPosition(parentDom, childDom)
+        common.listenEvent(div.querySelector('.ui-layer-no'), 'click', function(){
+            _this.$callback['no'] && _this.$callback['no']()
+            _this.close()
+        })
 
-        let _this = this
-        let resizeEvent = function(){
-            let parentDom = document.getElementById(parendId),
-                childDom = parentDom ? parentDom.querySelectorAll('.' + childId) : null
+        common.listenEvent(div.querySelector('.ui-layer-yes'), 'click', function(){
+            _this.yes()
+        })
 
-            _this.setPosition(parentDom, childDom)
-        }
+        common.listenEvent(div.querySelector('.ui-layer-prompt-val'), 'change', function(v){
+            _this.promptVal = div.querySelector('.ui-layer-prompt-val').value
+        })
 
-        common.listenEvent(window, 'resize', resizeEvent)
-    }
 
-    setPosition(container, box){
-        if(!container || !box)
-            return
-        let containerw = container.offsetWidth
-        let boxMarginLeft = box[0].style.marginLeft.replace('px', '') >> 0
-        let boxMarginRight = box[0].style.marginRight.replace('px', '') >> 0
-        let boxMarginTop = box[0].style.marginTop.replace('px', '') >> 0
-        let boxMarginBottom = box[0].style.marginBottom.replace('px', '') >> 0
 
-        let boxw = box[0].offsetWidth + boxMarginLeft + boxMarginRight
-        let maxColumLen = Math.floor(containerw / boxw)
-        for(let i = 0;i < box.length;i++){
-            let margin = boxMarginTop + boxMarginBottom
 
-            let top = 0
-            let left = boxw * (i % maxColumLen) + 'px'
 
-            if(i + 1 > maxColumLen){
-                if(i - maxColumLen < maxColumLen){
-                    top = box[i - maxColumLen].offsetHeight + margin + 'px'
-                }else{
-                    let curBox = box[i - maxColumLen]
-                    top = (curBox.style.transform.split(',')[1].replace('px)', '') >> 0) + curBox.offsetHeight + margin + 'px'
-                }
+        common.observable(this, 'type', function(v){
+
+            if(v <= 3)
+                getLayerPosition(_this)
+
+        })
+
+        common.observable(this, ['title', 'html', 'icon', 'promptVal'], function(v, k){
+            if(k === 'title'){
+                div.querySelector('.ui-layer-title-text').innerHTML = v
+            }else if(k === 'html'){
+                console.log(v);
+                div.querySelector('.ui-layer-content-html').innerHTML = v
+            }else if(k === 'icon'){
+                div.querySelector('.ui-layer-icon').innerHTML = v
+            }else if(k === 'promptVal'){
+                div.querySelector('.ui-layer-prompt-val').value = v
+            }
+        })
+
+        common.observable(this, 'show', function(v){
+            var type = _this.type
+            div.querySelector('.ui-layer-shade').style.display = v ? 'block' : 'none'
+            if(type <= 3){
+                div.querySelector('.ui-layer').style.display = v ? 'block' : 'none'
+                if(type == 3)
+                    div.querySelector('.ui-layer-prompt-val').style.display = v ? 'block' : 'none'
             }
 
-            box[i].style.cssText += `transform: translate(${left},${top})`
+            if(type == 4){
+                div.querySelector('.ui-layer-loading').style.display = v ? 'block' : 'none'
+            }
+        })
+
+        document.body.appendChild(div)
+
+        window.onresize = function(){
+            getLayerPosition(_this)
         }
+    }
+
+    yes(){
+        this.show = false
+        if(this.$callback['yes']){
+            if(this.promptVal){
+                this.$callback['yes'](this.promptVal)
+                this.promptVal = ''
+            }else{
+                this.$callback['yes']()
+            }
+        }
+    }
+
+    alert(html,opt = {}){
+        this.type = 1
+        this.html = html
+        this.$callback['no'] = opt.callback ? opt.callback : function(){}
+        this.title = opt.title ? opt.title : '提示'
+        this.icon = opt.icon ? icon[opt.icon] : '&#xe6af;'
+        this.show = true
+    }
+
+    confirm(html,opt = {}){
+        this.type = 2
+        this.html = html
+        this.$callback['yes'] = opt.yes ? opt.yes : function(){}
+        this.$callback['no'] = opt.no ? opt.no : function(){}
+        this.title = opt.title ? opt.title : '提示'
+        this.icon = opt.icon ? icon[opt.icon] : '&#xe6af;'
+        this.show = true
+    }
+
+    prompt(html, opt = {}){
+        this.type = 3
+        this.html = html
+        this.$callback['yes'] = opt.yes ? opt.yes : function(){}
+        this.$callback['no'] = opt.no ? opt.no : function(){}
+        this.title = opt.title ? opt.title : '提示'
+        this.icon = opt.icon ? icon[opt.icon] : '&#xe6af;'
+        this.show = true
+    }
+
+    loading(opt = {}){
+        this.type = 4
+        this.$callback.callback = opt && opt.callback ? opt.callback : function(){}
+        this.show = true
+    }
+
+    close(ev){
+        this.show = false
+        this.html = ''
+        this.title = '提示'
+        this.icon = '&#xe6af;'
+        this.promptVal = ''
+        if(this.$callback['no']){
+            this.$callback['no']()
+            delete this.$callback['no']
+        }
+        this.$callback = {}
+        this.type = 5
     }
 
 
 }
 
-export default UiWaterFall
+let UiLayer = new Layer()
+UiLayer.init()
+
+export default UiLayer

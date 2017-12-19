@@ -16,7 +16,7 @@ var watch = function(obj, prop, cb){
         },
         set: function(newVal){
             oldVal = newVal
-            cb && cb(newVal)
+            cb && cb(newVal, prop)
         }
     })
 }

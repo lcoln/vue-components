@@ -123,7 +123,7 @@ es6: https://components.cncoders.me/components/pages/main-es6.js //import UiPage
             }, function(curr){
                 _this.list = showData(arr, curr)
             })
-            // vue.log(pages)
+            vue.log(pages)
 
             var pages2 = new UiPages()
             pages2.init('pages2', {

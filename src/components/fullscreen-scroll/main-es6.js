@@ -23,7 +23,6 @@ class UiFullScreenScroll{
 
     $el(parendId, childId, time){
         var parentDom = document.getElementById(parendId)
-        parentDom.style.overflow = 'hidden'
 
         var childDom = parentDom.querySelectorAll('.' + childId)
         var container = document.createElement('section')
@@ -58,7 +57,7 @@ class UiFullScreenScroll{
         container.id = 'pageName-' + this.id
 
 
-        parentDom.style.position = 'relative'
+        parentDom.style.cssText = 'position: relative;overflow: hidden;'
         parentDom.appendChild(container)
         parentDom.appendChild(btnGroup)
         return parentDom
@@ -66,9 +65,9 @@ class UiFullScreenScroll{
 
     init(parendId, childId, time){
         this.el = this.$el(parendId, childId, time)
-        UiFullScreenScroll.curHeight(this.el)
         var container = this.el.querySelector('.' + childId).parentNode,
-        childDom = container.childNodes
+            childDom = container.childNodes,
+            len = container.childNodes.length
 
         var mouseWheelEv = /Firefox/i.test(navigator.userAgent) ? "DOMMouseScroll": "mousewheel",
         direction = /Firefox/i.test(navigator.userAgent) ? "detail": "deltaY",
@@ -77,17 +76,9 @@ class UiFullScreenScroll{
         common.listenEvent(this.el, mouseWheelEv, function(ev){
             if(Date.now() - now > 1000){
                 if(ev[direction] > 0){
-                    if(_this.curPage + 1 < childDom.length){
-                        _this.curPage++
-                    }else{
-                        _this.curPage = 0
-                    }
+                    _this.curPage = (_this.curPage + 1 < len) ? (_this.curPage + 1) : 0
                 }else{
-                    if(_this.curPage - 1 >= 0){
-                        _this.curPage--
-                    }else{
-                        _this.curPage = childDom.length - 1
-                    }
+                    _this.curPage = (_this.curPage - 1 >= 0) ? (_this.curPage - 1) : len - 1
 
                 }
                 container.style.transform = 'translate(0px, ' + -UiFullScreenScroll.curHeight(_this.el) * _this.curPage + 'px)'

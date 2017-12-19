@@ -131,6 +131,7 @@ Layer.prototype = {
     icon: '&#xe6af;',
     promptVal: '',
     show: false,
+    hasCss: false,
     init: function(){
         var _this = this
 
@@ -203,9 +204,6 @@ Layer.prototype = {
             getLayerPosition(_this)
         }
     },
-    render: function(container){
-
-    },
     yes: function(){
         this.show = false
         if(this.$callback['yes']){
@@ -262,8 +260,6 @@ Layer.prototype = {
         this.type = 5
     }
 }
-
-Layer.prototype.hasCss = false
 
 Layer.prototype.init()
 
