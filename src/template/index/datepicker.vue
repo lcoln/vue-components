@@ -15,7 +15,7 @@
 <script>
     import store from 'store'
     import vue from 'vue'
-    import UiDatePicker from '@/components/datepicker/main-es6.js'
+    // import UiDatePicker from '@/components/datepicker/main-es6.js'
 
     export default {
         name: 'app',
@@ -46,12 +46,13 @@ datePicker2.init('datePicker2', {
 
         },
         mounted: async function(){
-            // require('@/components/datepicker/main-es5.js')
+            require('@/components/datepicker/main-es5.js')
             var datePicker = new UiDatePicker()
-            console.log(datePicker.init);
+            // console.log(datePicker.init);
             datePicker.init('datePicker', {
                 maxDate: Date.now() + 240 * 60 * 60 * 24 * 1000,
-                minDate: Date.now() - 240 * 60 * 60 * 24 * 1000
+                minDate: Date.now() - 240 * 60 * 60 * 24 * 1000,
+                dateVal: Date.now()
             })
 
             var datePicker2 = new UiDatePicker()

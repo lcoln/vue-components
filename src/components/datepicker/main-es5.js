@@ -71,24 +71,45 @@ var minDate = Date.now() - 40 * 60 * 60 * 24 * 1000,
 var monthChange = false
 
 function filterDate(date, format){
+    var now = new Date(date),
+        Y = now.getFullYear(),
+        M = fullNum(now.getMonth() + 1),
+        D = fullNum(now.getDate()),
+        h = fullNum(now.getHours()),
+        m = fullNum(now.getMinutes()),
+        s = fullNum(now.getSeconds())
     switch(format) {
         case 'Y':
-            return new Date(date).getFullYear()
+            return Y
             break;
-        case 'm':
-            return new Date(date).getMonth() + 1
+        case 'M':
+            return M
             break;
-        case 'd':
-            return new Date(date).getDate()
+        case 'D':
+            return D
             break;
     }
 }
 
 window.UiDatePicker = function (){
 
-    var _this = this
-    this.init = function(parendId, config, callback){
+}
 
+UiDatePicker.prototype = {
+    curYear: curYear,
+    curMonth: curMonth < 10 ? '0' + curMonth : curMonth,
+    currDay: curDay,
+    dateList: [],
+    isShow: false,
+    dateVal: '',
+    minDate: minDate,
+    maxDate: maxDate,
+    msg: '',
+    opts: {},
+    hasCss: false,
+    init: function(parendId, config, callback){
+
+        var _this = this
         var parentDom = document.getElementById(parendId)
         if(!parentDom)
             return
@@ -108,7 +129,27 @@ window.UiDatePicker = function (){
 
         var container = document.createElement('div')
         container.className = ` ui-datepicker`
-        container.innerHTML = '<input type="text" class="date-input" /><dl class="date-dl" style="display: none;"><dt>请选择日期</dt><dd><nav class="ui-fn-cl date-nav" class="ui-fn-cl"><a href="javascript:;"><<</a><a href="javascript:;"><</a><span class="date-val">' + this.curYear + ' - ' + this.curMonth + '</span><a href="javascript:;">></a><a href="javascript:;">>></a></nav><ul><li class="ui-fn-cl"><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span><span>七</span></li><li class="msg" style="display: none;">' + this.msg + '</li><li class="ui-fn-cl date-list"></li></ul></dd></dl>'
+        container.innerHTML = '<input type="text" class="date-input" /><dl class="date-dl" style="display: none;"><dt>请选择日期</dt><dd><nav class="ui-fn-cl date-nav" class="ui-fn-cl"><a href="javascript:;"><<</a><a href="javascript:;"><</a><span class="date-val">' + this.curYear + ' - ' + this.curMonth + '</span><a href="javascript:;">></a><a href="javascript:;">>></a></nav><ul><li class="ui-fn-cl"><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span><span>七</span></li><li class="msg" style="display: none;">' + this.msg + '</li><li class="ui-fn-cl date-list"></li></ul></dd><dd class="date-time"><label><input class="date-time-h" type="text" />时</label><label><input class="date-time-m" type="text" />分</label><label><input class="date-time-s" type="text" />秒</label><a class="date-time-btn" href="javascript:;">现在</a></dd></dl>'
+
+
+
+        if((this.dateVal + '').length === 13){
+            var now = new Date(this.dateVal)
+            var y = now.getFullYear()
+            var m = now.getMonth() + 1
+            var d = now.getDate()
+            m = fullNum(m)
+            d = fullNum(d)
+            console.log(y, m, d);
+            container.querySelector('.date-input').value = '' + y + '-' + m + '-' + d
+        }else if(/^\d{4}-\d{2}-\d{2}$/.test(this.dateVal)){
+            var tmp = this.dateVal.split
+            if(tmp[1] <= 12 && tmp[1] > 0 && tmp[2] > 0 && tmp[2] <= 31){
+                container.querySelector('.date-input').value = this.dateVal
+            }
+        }
+        this.dateVal = container.querySelector('.date-input').value
+
 
         listen(container.querySelector('.date-input'), 'click', function(ev){
             _this.caculateDate(ev)
@@ -163,10 +204,10 @@ window.UiDatePicker = function (){
         this.opts = {
             maxy: this.maxDate && filterDate(this.maxDate, 'Y'),
             miny: this.minDate && filterDate(this.minDate, 'Y'),
-            maxm: this.maxDate && fullNum(filterDate(this.maxDate, 'm')),
-            minm: this.minDate && fullNum(filterDate(this.minDate, 'm')),
-            maxd: this.maxDate && fullNum(filterDate(this.maxDate, 'd')),
-            mind: this.minDate && fullNum(filterDate(this.minDate, 'd'))
+            maxm: this.maxDate && filterDate(this.maxDate, 'M'),
+            minm: this.minDate && filterDate(this.minDate, 'M'),
+            maxd: this.maxDate && filterDate(this.maxDate, 'D'),
+            mind: this.minDate && filterDate(this.minDate, 'D')
         }
 
         calculate(this, this.curYear, this.curMonth)
@@ -175,14 +216,14 @@ window.UiDatePicker = function (){
 
         parentDom.appendChild(container)
 
-        observable(_this, 'curYear',function(v){
+        observable(this, 'curYear',function(v){
             if(monthChange)
                 return
             calculate(_this, v, _this.curMonth)
             container.querySelector('.date-val').innerHTML = _this.curYear + '-' + _this.curMonth
         })
 
-        observable(_this, 'curMonth',function(v){
+        observable(this, 'curMonth',function(v){
             monthChange = true
             setTimeout(function(){
                 calculate(_this, _this.curYear, v)
@@ -191,13 +232,13 @@ window.UiDatePicker = function (){
             }, 0)
         })
 
-        observable(_this, 'dateList',function(v){
+        observable(this, 'dateList',function(v){
             setTimeout(function(){
                 _this.render(container.querySelector('.date-list'))
             }, 0)
         })
 
-        observable(_this, 'msg',function(v){
+        observable(this, 'msg',function(v){
             if(!v)
                 return
             container.querySelector('.msg').innerHTML = v
@@ -208,28 +249,11 @@ window.UiDatePicker = function (){
             },1000)
         })
 
-        /*observable(this, 'dateVal', function(v){
-            container.querySelector('.date-input').value = v
-        })*/
-
         observable(this, 'isShow', function(v){
             container.querySelector('.date-dl').style.display = v ? 'block' : 'none'
         })
 
-    }
-}
-
-UiDatePicker.prototype = {
-    curYear: curYear,
-    curMonth: curMonth < 10 ? '0' + curMonth : curMonth,
-    currDay: curDay,
-    dateList: [],
-    isShow: false,
-    dateVal: '',
-    minDate: minDate,
-    maxDate: maxDate,
-    msg: '',
-    opts: {},
+    },
     show: function(){
         this.isShow = !0
     },
@@ -295,13 +319,14 @@ UiDatePicker.prototype = {
     }
 }
 
-UiDatePicker.prototype.hasCss = false
 
 function fullNum(num){
     if(num < 10)
         return '0' + parseInt(num)
 
     return num
+
+
 }
 
 //获取当月天数
@@ -338,6 +363,6 @@ function calculate(vm, y, m){
 }
 
 function escape2Html(str) {
-   var arrEntities={'lt':'<','gt':'>','nbsp':' ','amp':'&','quot':'"'};
+   var arrEntities = {'lt':'<','gt':'>','nbsp':' ','amp':'&','quot':'"'};
    return str.replace(/&(lt|gt|nbsp|amp|quot);/ig,function(all,t){return arrEntities[t];});
 }

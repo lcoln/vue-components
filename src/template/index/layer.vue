@@ -19,9 +19,9 @@
 <script>
     import store from 'store'
     import vue from 'vue'
-    import UiLayer from '@/components/layer/main-es6.js'
-    /*import dialog from '@/components/layer/';
-    vue.use(dialog)*/
+    // import UiLayer from '@/components/layer/main-es6.js'
+    import dialog from '@/components/layer/';
+    vue.use(dialog)
 
     this.$layer = null
     export default {
@@ -36,7 +36,7 @@
                 this.$layer.alert("<div>Internal Server Error</div>",{
                     title: 'alert',
                     icon: 2,
-                    callback: function(){console.log('test');}
+                    no: function(){console.log('test');}
                 })
 
                 // this.$layer.alert(111, {title: 'alert', no: function(){console.log('close');}})
@@ -47,10 +47,10 @@
                     title: 'confirm',
                     icon: 3,
                     yes: function(){
-
+                        console.log('yes');
                     },
                     no: function(){
-
+                        console.log('no');
                     }
                 })
 
@@ -58,7 +58,7 @@
             },
             loading () {
                 let _this = this
-                this.$layer.loading({callback: function(){setTimeout(function(){this.$layer.close()}, 3000)}})
+                this.$layer.loading(function(){setTimeout(function(){_this.$layer.close()}, 3000)})
             },
             prompt () {
                 this.$layer.prompt('<div>Are you a boy or a girl ?</div>',{
@@ -76,7 +76,7 @@
         },
         mounted: function(){
             // require('@/components/layer/main-es5.js')
-            this.$layer = UiLayer
+            // this.$layer = UiLayer
             console.log(this.$layer);
         },
         computed: {

@@ -119,6 +119,15 @@ document.addEventListener('contextmenu',function(){
     offset = layer = null
 })
 
+function method(html, opt){
+    this.html = html
+    this.$callback['yes'] = opt.yes ? opt.yes : function(){}
+    this.$callback['no'] = opt.no ? opt.no : function(){}
+    this.title = opt.title ? opt.title : '提示'
+    this.icon = opt.icon ? icon[opt.icon] : '&#xe6af;'
+    this.show = true
+}
+
 var Layer = function (){
     this.id = Date.now() + '_layer'
 }
@@ -149,7 +158,6 @@ Layer.prototype = {
         })
 
         listenEvent(div.querySelector('.ui-layer-no'), 'click', function(){
-            _this.$callback['no'] && _this.$callback['no']()
             _this.close()
         })
 
@@ -187,6 +195,8 @@ Layer.prototype = {
         observable(this, 'show', function(v){
             var type = _this.type
             div.querySelector('.ui-layer-shade').style.display = v ? 'block' : 'none'
+
+            div.querySelector('.ui-layer-group-btn').style.display = type == 1 ? 'none' : 'block'
             if(type <= 3){
                 div.querySelector('.ui-layer').style.display = v ? 'block' : 'none'
                 if(type == 3)
@@ -217,33 +227,21 @@ Layer.prototype = {
     },
     alert: function(html,opt){
         this.type = 1
-        this.html = html
-        this.$callback['no'] = opt.callback ? opt.callback : function(){}
-        this.title = opt.title ? opt.title : '提示'
-        this.icon = opt.icon ? icon[opt.icon] : '&#xe6af;'
-        this.show = true
+        method.apply(this, arguments)
     },
     confirm: function(html,opt){
         this.type = 2
-        this.html = html
-        this.$callback['yes'] = opt.yes ? opt.yes : function(){}
-        this.$callback['no'] = opt.no ? opt.no : function(){}
-        this.title = opt.title ? opt.title : '提示'
-        this.icon = opt.icon ? icon[opt.icon] : '&#xe6af;'
-        this.show = true
+        method.apply(this, arguments)
     },
     prompt: function(html, opt){
         this.type = 3
-        this.html = html
-        this.$callback['yes'] = opt.yes ? opt.yes : function(){}
-        this.$callback['no'] = opt.no ? opt.no : function(){}
-        this.title = opt.title ? opt.title : '提示'
-        this.icon = opt.icon ? icon[opt.icon] : '&#xe6af;'
-        this.show = true
+        method.apply(this, arguments)
     },
-    loading: function(opt){
+    loading: function(cb){
         this.type = 4
-        this.$callback.callback = opt && opt.callback ? opt.callback : function(){}
+        if(toString.call(cb) !== '[object Function]')
+            return
+        cb && cb()
         this.show = true
     },
     close: function(ev){
