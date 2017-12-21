@@ -52,7 +52,8 @@ datePicker2.init('datePicker2', {
             datePicker.init('datePicker', {
                 maxDate: Date.now() + 240 * 60 * 60 * 24 * 1000,
                 minDate: Date.now() - 240 * 60 * 60 * 24 * 1000,
-                dateVal: Date.now()
+                dateVal: Date.now(),
+                showTime: true
             })
 
             var datePicker2 = new UiDatePicker()

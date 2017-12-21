@@ -88,7 +88,36 @@ function filterDate(date, format){
         case 'D':
             return D
             break;
+        case 'h':
+            return h
+            break;
+        case 'm':
+            return m
+            break;
+        case 's':
+            return s
+            break;
+        case 'Y-M-D h:m:s':
+            return Y + '-' + M + '-' + D + ' ' + h + ':' + m + ':' + s
+            break;
+        case 'Y-M-D':
+            return Y + '-' + M + '-' + D
+            break;
     }
+}
+
+function setDateVal(container){
+    if(this.showTime){
+        container.querySelector('.date-time').style.display = 'block'
+        container.querySelector('.date-input').value = filterDate(this.dateVal, 'Y-M-D h:m:s')
+        container.querySelector('.date-time-h').value = filterDate(this.dateVal, 'h')
+        container.querySelector('.date-time-m').value = filterDate(this.dateVal, 'm')
+        container.querySelector('.date-time-s').value = filterDate(this.dateVal, 's')
+    }else{
+        container.querySelector('.date-input').value = filterDate(this.dateVal, 'Y-M-D')
+    }
+
+    this.dateVal = filterDate(this.dateVal, 'Y-M-D')
 }
 
 window.UiDatePicker = function (){
@@ -107,6 +136,7 @@ UiDatePicker.prototype = {
     msg: '',
     opts: {},
     hasCss: false,
+    showTime: false,
     init: function(parendId, config, callback){
 
         var _this = this
@@ -132,23 +162,8 @@ UiDatePicker.prototype = {
         container.innerHTML = '<input type="text" class="date-input" /><dl class="date-dl" style="display: none;"><dt>请选择日期</dt><dd><nav class="ui-fn-cl date-nav" class="ui-fn-cl"><a href="javascript:;"><<</a><a href="javascript:;"><</a><span class="date-val">' + this.curYear + ' - ' + this.curMonth + '</span><a href="javascript:;">></a><a href="javascript:;">>></a></nav><ul><li class="ui-fn-cl"><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span><span>七</span></li><li class="msg" style="display: none;">' + this.msg + '</li><li class="ui-fn-cl date-list"></li></ul></dd><dd class="date-time"><label><input class="date-time-h" type="text" />时</label><label><input class="date-time-m" type="text" />分</label><label><input class="date-time-s" type="text" />秒</label><a class="date-time-btn" href="javascript:;">现在</a></dd></dl>'
 
 
+        setDateVal.call(this, container)
 
-        if((this.dateVal + '').length === 13){
-            var now = new Date(this.dateVal)
-            var y = now.getFullYear()
-            var m = now.getMonth() + 1
-            var d = now.getDate()
-            m = fullNum(m)
-            d = fullNum(d)
-            console.log(y, m, d);
-            container.querySelector('.date-input').value = '' + y + '-' + m + '-' + d
-        }else if(/^\d{4}-\d{2}-\d{2}$/.test(this.dateVal)){
-            var tmp = this.dateVal.split
-            if(tmp[1] <= 12 && tmp[1] > 0 && tmp[2] > 0 && tmp[2] <= 31){
-                container.querySelector('.date-input').value = this.dateVal
-            }
-        }
-        this.dateVal = container.querySelector('.date-input').value
 
 
         listen(container.querySelector('.date-input'), 'click', function(ev){
@@ -195,6 +210,32 @@ UiDatePicker.prototype = {
                 }
             }
         })
+
+        listen(container.querySelector('.date-time-btn'), 'click', function(ev){
+            _this.dateVal = Date.now()
+            setDateVal.call(_this, container)
+
+        })
+
+        var timeList = ['.date-time-h', '.date-time-m', '.date-time-s']
+        var maxTime = [23, 59, 59]
+        var oldTime = []
+        for(var i = 0;i < timeList.length;i++){
+            oldTime.push(container.querySelector(timeList[i]).value)
+            setTimeout((function(index){listen(container.querySelector(timeList[i]), 'input', function(ev){
+                // console.log(index);
+                var target = ev.target
+                var curVal = target.value
+                console.log(curVal >> 0);
+                console.log(/^\d$/.test(curVal >> 0))
+                if(curVal > maxTime[index] || curVal < 0 || (curVal + '').indexOf('.') > -1 || !/^\d$/.test(curVal >> 0)){
+                    _this.msg = '时间不符合格式'
+                    return ev.target.value = oldTime[index]
+                }
+
+                // console.log(ev.target.value);
+            })})(i), 0)
+        }
 
         listen(document, 'click', function(){
             _this.isShow = !1
@@ -343,9 +384,10 @@ function getDay(y, m){
 function calculate(vm, y, m){
     vm.dateList = []
     var firstDay = getDay(y, m)
+    var monthLen = getMonth(y, m)
     firstDay = firstDay == 0 ? 7 : firstDay
-    for(var i = 1 - firstDay;i < getMonth(y, m);i++){
-        var time = new Date(y, m - 1, i + 1).getTime()
+    for(var i = 1 - firstDay;i < monthLen;i++){
+
         var disabled = false
 
         if(vm.curYear + '' + vm.curMonth + fullNum(i) < vm.opts.miny + '' + vm.opts.minm + vm.opts.mind){
