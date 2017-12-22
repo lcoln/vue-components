@@ -13,7 +13,7 @@ a{text-decoration: none;}
 .ui-datepicker dl{width: 230px;text-align: center;padding: 15px;padding-bottom: 0;border: 1px solid #ccc;box-shadow: 0 0 2px #ccc;font-size: 13px;color: #666}
 .ui-datepicker dl .date-time{display: none;position: relative;height: 20px;margin-bottom: 5px;}
 .ui-datepicker dl .date-time:before{content: '';position: absolute;top: -8px;left: 0;width: 100%;border-top: 1px solid #ddd;}
-.ui-datepicker dl .date-time .date-time-btn{float: right;width: 40px;height: 20px;line-height: 20px;border: 1px solid #ddd;border-radius: 2px;font-size: 12px;color: #3FB8AF;}
+.ui-datepicker dl .date-time .date-time-now{float: right;width: 40px;height: 20px;line-height: 20px;border: 1px solid #ddd;border-radius: 2px;font-size: 12px;color: #3FB8AF;}
 .ui-datepicker dl label{float: left;width: 23%;}
 .ui-datepicker dl label input{width: 25px;height: 20px;border: 1px solid #bbb;margin-right: 4px;margin-left: 2px;padding-left: 2px;}
 .ui-datepicker dt{padding: 5px;background: rgba(0,0,0,.1);}
@@ -26,8 +26,8 @@ a{text-decoration: none;}
 .ui-datepicker dd ul li:nth-of-type(1){border-top: 1px solid #ccc;padding: 5px;border-bottom: 1px solid #ccc;}
 .ui-datepicker dd ul span{float: left;width: 14.28%;height: 20px;line-height: 20px;transition: .4s;}
 .ui-datepicker dd ul .date-list span{cursor: pointer;}
+.ui-datepicker dd ul .date-list .disabled{color: #bbb;cursor:not-allowed}
 
 .ui-datepicker dd ul .msg{position: absolute;top: 21px;left: 50%;margin-left: -75px;width: 150px;height: 30px;line-height: 30px;background: rgba(0,0,0,.6);color: #fff;}
 .ui-datepicker dd ul .act:hover{background: #73C8A9;color: #fff;}
 .ui-datepicker dd ul .act.select{background: #73C8A9;color: #fff;}
-.ui-datepicker dd ul .disabled{color: #bbb;cursor:not-allowed}

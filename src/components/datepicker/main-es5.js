@@ -78,6 +78,37 @@ function filterDate(date, format){
         h = fullNum(now.getHours()),
         m = fullNum(now.getMinutes()),
         s = fullNum(now.getSeconds())
+
+    /*if(format !== 'Y-M-D h:m:s' && format !== 'Y-M-D'){
+        return eval(format)
+    }else{
+        if(format === 'Y-M-D h:m:s'){
+            var tmp = format.split(' ')
+            var date = tmp[0].split('-')
+            var res = ''
+            for(var i = 0;i < date.length;i++){
+                res += fullNum(eval(date[i])) + '-'
+            }
+            res = res.slice(0, -1) + ' '
+
+            var time = tmp[1].split(':')
+            for(var i = 0;i < time.length;i++){
+                res += fullNum(eval(time[i])) + ':'
+            }
+            res = res.slice(0, -1)
+
+            return res
+        }
+        if(format === 'Y-M-D'){
+            var tmp = format.split('-')
+            var res = ''
+            for(var i = 0;i < tmp.length;i++){
+                res += fullNum(eval(tmp[i])) + '-'
+            }
+            res = res.slice(0, -1)
+            return res
+        }
+    }*/
     switch(format) {
         case 'Y':
             return Y
@@ -130,7 +161,7 @@ UiDatePicker.prototype = {
     currDay: curDay,
     dateList: [],
     isShow: false,
-    dateVal: '',
+    dateVal: now,
     minDate: minDate,
     maxDate: maxDate,
     msg: '',
@@ -159,7 +190,7 @@ UiDatePicker.prototype = {
 
         var container = document.createElement('div')
         container.className = ` ui-datepicker`
-        container.innerHTML = '<input type="text" class="date-input" /><dl class="date-dl" style="display: none;"><dt>请选择日期</dt><dd><nav class="ui-fn-cl date-nav" class="ui-fn-cl"><a href="javascript:;"><<</a><a href="javascript:;"><</a><span class="date-val">' + this.curYear + ' - ' + this.curMonth + '</span><a href="javascript:;">></a><a href="javascript:;">>></a></nav><ul><li class="ui-fn-cl"><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span><span>七</span></li><li class="msg" style="display: none;">' + this.msg + '</li><li class="ui-fn-cl date-list"></li></ul></dd><dd class="date-time"><label><input class="date-time-h" type="text" />时</label><label><input class="date-time-m" type="text" />分</label><label><input class="date-time-s" type="text" />秒</label><a class="date-time-btn" href="javascript:;">现在</a></dd></dl>'
+        container.innerHTML = '<input type="text" class="date-input" /><dl class="date-dl" style="display: none;"><dt>请选择日期</dt><dd><nav class="ui-fn-cl date-nav" class="ui-fn-cl"><a href="javascript:;"><<</a><a href="javascript:;"><</a><span class="date-val">' + this.curYear + ' - ' + this.curMonth + '</span><a href="javascript:;">></a><a href="javascript:;">>></a></nav><ul><li class="ui-fn-cl"><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span><span>七</span></li><li class="msg" style="display: none;">' + this.msg + '</li><li class="ui-fn-cl date-list"></li></ul></dd><dd class="date-time"><label><input class="date-time-h" type="text" />时</label><label><input class="date-time-m" type="text" />分</label><label><input class="date-time-s" type="text" />秒</label><a class="date-time-now" href="javascript:;">现在</a></dd></dl>'
 
 
         setDateVal.call(this, container)
@@ -188,6 +219,9 @@ UiDatePicker.prototype = {
                 _this.render(container.querySelector('.date-list'))
                 callback && callback()
             }
+            if(_this.showTime){
+                setDateVal.call(_this, container)
+            }
         })
 
         listen(container.querySelector('.date-nav'), 'click', function(ev){
@@ -211,9 +245,12 @@ UiDatePicker.prototype = {
             }
         })
 
-        listen(container.querySelector('.date-time-btn'), 'click', function(ev){
+        listen(container.querySelector('.date-time-now'), 'click', function(ev){
             _this.dateVal = Date.now()
             setDateVal.call(_this, container)
+            _this.curYear = filterDate(_this.dateVal, 'Y')
+            _this.curMonth = filterDate(_this.dateVal, 'M')
+            _this.render(container.querySelector('.date-list'))
 
         })
 
@@ -223,17 +260,19 @@ UiDatePicker.prototype = {
         for(var i = 0;i < timeList.length;i++){
             oldTime.push(container.querySelector(timeList[i]).value)
             setTimeout((function(index){listen(container.querySelector(timeList[i]), 'input', function(ev){
-                // console.log(index);
                 var target = ev.target
                 var curVal = target.value
-                console.log(curVal >> 0);
-                console.log(/^\d$/.test(curVal >> 0))
-                if(curVal > maxTime[index] || curVal < 0 || (curVal + '').indexOf('.') > -1 || !/^\d$/.test(curVal >> 0)){
+                if(curVal > maxTime[index] || curVal < 0 || (curVal + '').indexOf('.') > -1 || !/^\d+$/.test(curVal)){
                     _this.msg = '时间不符合格式'
-                    return ev.target.value = oldTime[index]
+                    curVal = oldTime[index]
+                    ev.target.value = curVal
                 }
+                var tmp = container.querySelector('.date-input').value.split(' ')
+                var time = tmp[1].split(':')
+                time[index] = curVal
+                _this.dateVal = tmp[0] + ' ' + time.join(':')
+                setDateVal.call(_this, container)
 
-                // console.log(ev.target.value);
             })})(i), 0)
         }
 
@@ -264,6 +303,10 @@ UiDatePicker.prototype = {
             container.querySelector('.date-val').innerHTML = _this.curYear + '-' + _this.curMonth
         })
 
+        /*observable(this, 'dateVal',function(v){
+
+        })*/
+        console.log(this.opts, curDay);
         observable(this, 'curMonth',function(v){
             monthChange = true
             setTimeout(function(){
@@ -324,7 +367,7 @@ UiDatePicker.prototype = {
         var time = new Date(year + '-' + month, curDay).getTime()
         month = fullNum(month)
 
-        if((time < this.minDate || time > this.maxDate) || (year + '' + month < this.opts.miny + '' + this.opts.minm) || (year + '' + month > this.opts.maxy + '' + this.opts.maxm))
+        if((time < this.minDate || time > this.maxDate) || (year + '' + month < this.opts.miny + '' + this.opts.minm) || (year + '' + month > this.opts.maxy + '' + this.opts.maxm) || (month == this.opts.minm && year == this.opts.miny && this.opts.mind == getMonthLen(year, month)))
             return this.msg = '超过日期限制'
         if(month !== this.curMonth)
             this.curMonth = month
@@ -348,13 +391,13 @@ UiDatePicker.prototype = {
         if(dates.length > 0 && container){
             var dom = ''
             var className = ''
+            console.log(dates);
             for(var i = 0, len = dates.length;i < len;i++){
-                className = dates[i].disabled ? 'disabled' : 'act'
+                className = dates[i].disabled || !dates[i].day ? 'disabled' : 'act'
                 className += this.curYear + '-' + this.curMonth + '-' + dates[i].day == this.dateVal ? ' select' : ''
                 dom += '<span class="' + className + '">' + dates[i].day + '</span>'
             }
             container.innerHTML = dom
-            // console.log(container);
         }
 
     }
@@ -371,7 +414,7 @@ function fullNum(num){
 }
 
 //获取当月天数
-function getMonth(y, m){
+function getMonthLen(y, m){
     return new Date(y, m, 0).getDate()
 }
 
@@ -384,18 +427,19 @@ function getDay(y, m){
 function calculate(vm, y, m){
     vm.dateList = []
     var firstDay = getDay(y, m)
-    var monthLen = getMonth(y, m)
+    var monthLen = getMonthLen(y, m)
     firstDay = firstDay == 0 ? 7 : firstDay
     for(var i = 1 - firstDay;i < monthLen;i++){
 
         var disabled = false
 
-        if(vm.curYear + '' + vm.curMonth + fullNum(i) < vm.opts.miny + '' + vm.opts.minm + vm.opts.mind){
+        if(vm.curYear + '' + fullNum(vm.curMonth) + fullNum(i) < vm.opts.miny + '' + vm.opts.minm + vm.opts.mind){
             disabled = true
         }
-        else if(vm.curYear + '' + vm.curMonth + fullNum(i) > vm.opts.maxy + '' + vm.opts.maxm + vm.opts.maxd){
+        else if(vm.curYear + '' + fullNum(vm.curMonth) + fullNum(i) >= vm.opts.maxy + '' + vm.opts.maxm + vm.opts.maxd){
             disabled = true
         }
+        console.log(i);
 
         vm.dateList.push({
             day: i >= 0 ? i + 1 : '',
