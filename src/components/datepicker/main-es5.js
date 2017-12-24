@@ -79,36 +79,6 @@ function filterDate(date, format){
         m = fullNum(now.getMinutes()),
         s = fullNum(now.getSeconds())
 
-    /*if(format !== 'Y-M-D h:m:s' && format !== 'Y-M-D'){
-        return eval(format)
-    }else{
-        if(format === 'Y-M-D h:m:s'){
-            var tmp = format.split(' ')
-            var date = tmp[0].split('-')
-            var res = ''
-            for(var i = 0;i < date.length;i++){
-                res += fullNum(eval(date[i])) + '-'
-            }
-            res = res.slice(0, -1) + ' '
-
-            var time = tmp[1].split(':')
-            for(var i = 0;i < time.length;i++){
-                res += fullNum(eval(time[i])) + ':'
-            }
-            res = res.slice(0, -1)
-
-            return res
-        }
-        if(format === 'Y-M-D'){
-            var tmp = format.split('-')
-            var res = ''
-            for(var i = 0;i < tmp.length;i++){
-                res += fullNum(eval(tmp[i])) + '-'
-            }
-            res = res.slice(0, -1)
-            return res
-        }
-    }*/
     switch(format) {
         case 'Y':
             return Y
@@ -138,22 +108,22 @@ function filterDate(date, format){
 }
 
 function setDateVal(container){
+
     if(this.showTime){
         container.querySelector('.date-time').style.display = 'block'
         container.querySelector('.date-input').value = filterDate(this.dateVal, 'Y-M-D h:m:s')
-        container.querySelector('.date-time-h').value = filterDate(this.dateVal, 'h')
-        container.querySelector('.date-time-m').value = filterDate(this.dateVal, 'm')
-        container.querySelector('.date-time-s').value = filterDate(this.dateVal, 's')
     }else{
         container.querySelector('.date-input').value = filterDate(this.dateVal, 'Y-M-D')
     }
 
-    this.dateVal = filterDate(this.dateVal, 'Y-M-D')
 }
 
 window.UiDatePicker = function (){
 
 }
+
+//
+var curTime = []
 
 UiDatePicker.prototype = {
     curYear: curYear,
@@ -193,6 +163,10 @@ UiDatePicker.prototype = {
         container.innerHTML = '<input type="text" class="date-input" /><dl class="date-dl" style="display: none;"><dt>请选择日期</dt><dd><nav class="ui-fn-cl date-nav" class="ui-fn-cl"><a href="javascript:;"><<</a><a href="javascript:;"><</a><span class="date-val">' + this.curYear + ' - ' + this.curMonth + '</span><a href="javascript:;">></a><a href="javascript:;">>></a></nav><ul><li class="ui-fn-cl"><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span><span>七</span></li><li class="msg" style="display: none;">' + this.msg + '</li><li class="ui-fn-cl date-list"></li></ul></dd><dd class="date-time"><label><input class="date-time-h" type="text" />时</label><label><input class="date-time-m" type="text" />分</label><label><input class="date-time-s" type="text" />秒</label><a class="date-time-now" href="javascript:;">现在</a></dd></dl>'
 
 
+        curTime = [filterDate(this.dateVal, 'h'), filterDate(this.dateVal, 'm'), filterDate(this.dateVal, 's')]
+        container.querySelector('.date-time-h').value = curTime[0]
+        container.querySelector('.date-time-m').value = curTime[1]
+        container.querySelector('.date-time-s').value = curTime[2]
         setDateVal.call(this, container)
 
 
@@ -214,13 +188,17 @@ UiDatePicker.prototype = {
             if(target.nodeName === 'SPAN'){
                 if(!target.className || target.className === 'disabled')
                     return
-                container.querySelector('.date-input').value = _this.curYear + '-' + _this.curMonth + '-' + target.innerHTML
+                if(_this.showTime){
+                    container.querySelector('.date-input').value = _this.curYear + '-' + _this.curMonth + '-' + target.innerHTML + ' ' + curTime[0] + ':' + curTime[1] + ':' + curTime[2]
+                    setTimeout(function(){
+                        setDateVal.call(_this, container)
+                    }, 0)
+                }else{
+                    container.querySelector('.date-input').value = _this.curYear + '-' + _this.curMonth + '-' + target.innerHTML
+                }
                 _this.dateVal = container.querySelector('.date-input').value
                 _this.render(container.querySelector('.date-list'))
                 callback && callback()
-            }
-            if(_this.showTime){
-                setDateVal.call(_this, container)
             }
         })
 
@@ -270,6 +248,7 @@ UiDatePicker.prototype = {
                 var tmp = container.querySelector('.date-input').value.split(' ')
                 var time = tmp[1].split(':')
                 time[index] = curVal
+                curTime[index] = curVal
                 _this.dateVal = tmp[0] + ' ' + time.join(':')
                 setDateVal.call(_this, container)
 
@@ -306,7 +285,6 @@ UiDatePicker.prototype = {
         /*observable(this, 'dateVal',function(v){
 
         })*/
-        console.log(this.opts, curDay);
         observable(this, 'curMonth',function(v){
             monthChange = true
             setTimeout(function(){
@@ -388,13 +366,13 @@ UiDatePicker.prototype = {
      */
     render: function(container){
         let dates = this.dateList
+        var curDate = filterDate(this.dateVal, 'Y-M-D')
         if(dates.length > 0 && container){
             var dom = ''
             var className = ''
-            console.log(dates);
             for(var i = 0, len = dates.length;i < len;i++){
                 className = dates[i].disabled || !dates[i].day ? 'disabled' : 'act'
-                className += this.curYear + '-' + this.curMonth + '-' + dates[i].day == this.dateVal ? ' select' : ''
+                className += this.curYear + '-' + this.curMonth + '-' + dates[i].day == curDate ? ' select' : ''
                 dom += '<span class="' + className + '">' + dates[i].day + '</span>'
             }
             container.innerHTML = dom
@@ -439,7 +417,6 @@ function calculate(vm, y, m){
         else if(vm.curYear + '' + fullNum(vm.curMonth) + fullNum(i) >= vm.opts.maxy + '' + vm.opts.maxm + vm.opts.maxd){
             disabled = true
         }
-        console.log(i);
 
         vm.dateList.push({
             day: i >= 0 ? i + 1 : '',
