@@ -103,7 +103,7 @@
             }
             .container{width: 100%;height: 100%;/* overflow: auto; */
                 .code{margin: 30px;padding: 10px;box-shadow: 0 0 5px #ddd;background: #F7F7F7;overflow: auto;}
-                .exam{position: relative;height: 100%;padding: 30px;overflow: auto;}
+                .exam{position: relative;height: calc(100% - 40px);padding: 30px;overflow: auto;}
             }
         }
     }

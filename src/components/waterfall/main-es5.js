@@ -63,18 +63,37 @@ var observable = function(obj, prop, cb){
 
 }
 
+function fillBox(childDom){
+
+    var frag = document.createDocumentFragment()
+    var rangeh = this.config.range
+    var margin = this.config.margin
+    var width = this.config.width
+    var i = 0
+    var len = childDom.length
+
+    for(;i < len;i++){
+        childDom[i].style.cssText = 'position: absolute;width: ' + width + 'px;height: ' + (Math.random() * (rangeh[1] - rangeh[0]) + rangeh[0]) + 'px;margin: ' + margin + 'px;transition: .4s;'
+        frag.appendChild(childDom[i])
+    }
+
+    container.appendChild(frag)
+}
 
 window.UiWaterFall = function (){
 
 }
 UiWaterFall.prototype = {
     id: Date.now() + '_waterfall',
-    config: {}
+    config: {},
 }
+
+var container = null
 
 UiWaterFall.prototype.init = function(parendId, childId, config){
     var parentDom = document.getElementById(parendId),
         childDom = parentDom.querySelectorAll('.' + childId)
+
 
     if(!UiWaterFall.prototype.hasCss){
         document.head.innerHTML += '<link rel="stylesheet" type="text/css" href="/static/css/waterfall/waterfall.css">'
@@ -88,21 +107,9 @@ UiWaterFall.prototype.init = function(parendId, childId, config){
         width: config.width || 200
     }
 
-    var rangeh = this.config.range
-    var margin = this.config.margin
-    var width = this.config.width
-
-    var frag = document.createDocumentFragment(),
-        i = 0,
-        len = childDom.length
-    for(;i < len;i++){
-        childDom[i].style.cssText = 'position: absolute;width: ' + width + 'px;height: ' + (Math.random() * (rangeh[1] - rangeh[0]) + rangeh[0]) + 'px;margin: ' + margin + 'px;transition: .4s;'
-        frag.appendChild(childDom[i])
-    }
-
-    var container = document.createElement('section')
+    container = document.createElement('section')
     container.className = 'ui-waterfall'
-    container.appendChild(frag)
+    fillBox.call(this, childDom)
 
     this.setContainerWidth(parentDom, childDom, container).setPosition(parentDom, childDom)
 
@@ -156,6 +163,28 @@ UiWaterFall.prototype.setContainerWidth = function(parentDom, childDom, containe
     var w = this.maxColumLen * (this.config.width + this.config.margin * 2)
     container.style.cssText = 'width: ' + w + 'px;'
     return this
+}
+
+//增加元素
+UiWaterFall.prototype.addBox = function(parendId, childId, nums){
+    nums = nums || 10
+    var tmp = []
+    for(var i = 0;i < nums;i++){
+        var div = document.createElement('div')
+        div.className = childId
+        tmp.push(div)
+    }
+
+    fillBox.call(this, tmp)
+    var parentDom = document.getElementById(parendId),
+        childDom = parentDom.querySelectorAll('.' + childId)
+
+    this.setPosition(parentDom, childDom)
+    var _this = this
+    listenEvent(window, 'resize', function(){
+
+        _this.setContainerWidth(parentDom, childDom, container).setPosition(parentDom, childDom)
+    })
 }
 
 UiWaterFall.prototype.hasCss = false

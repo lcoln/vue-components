@@ -110,7 +110,11 @@ function filterDate(date, format){
 function setDateVal(container){
 
     if(this.showTime){
+        curTime = [filterDate(this.dateVal, 'h'), filterDate(this.dateVal, 'm'), filterDate(this.dateVal, 's')]
         container.querySelector('.date-time').style.display = 'block'
+        container.querySelector('.date-time-h').value = curTime[0]
+        container.querySelector('.date-time-m').value = curTime[1]
+        container.querySelector('.date-time-s').value = curTime[2]
         container.querySelector('.date-input').value = filterDate(this.dateVal, 'Y-M-D h:m:s')
     }else{
         container.querySelector('.date-input').value = filterDate(this.dateVal, 'Y-M-D')
@@ -163,10 +167,6 @@ UiDatePicker.prototype = {
         container.innerHTML = '<input type="text" class="date-input" /><dl class="date-dl" style="display: none;"><dt>请选择日期</dt><dd><nav class="ui-fn-cl date-nav" class="ui-fn-cl"><a href="javascript:;"><<</a><a href="javascript:;"><</a><span class="date-val">' + this.curYear + ' - ' + this.curMonth + '</span><a href="javascript:;">></a><a href="javascript:;">>></a></nav><ul><li class="ui-fn-cl"><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span><span>七</span></li><li class="msg" style="display: none;">' + this.msg + '</li><li class="ui-fn-cl date-list"></li></ul></dd><dd class="date-time"><label><input class="date-time-h" type="text" />时</label><label><input class="date-time-m" type="text" />分</label><label><input class="date-time-s" type="text" />秒</label><a class="date-time-now" href="javascript:;">现在</a></dd></dl>'
 
 
-        curTime = [filterDate(this.dateVal, 'h'), filterDate(this.dateVal, 'm'), filterDate(this.dateVal, 's')]
-        container.querySelector('.date-time-h').value = curTime[0]
-        container.querySelector('.date-time-m').value = curTime[1]
-        container.querySelector('.date-time-s').value = curTime[2]
         setDateVal.call(this, container)
 
 
@@ -371,8 +371,9 @@ UiDatePicker.prototype = {
             var dom = ''
             var className = ''
             for(var i = 0, len = dates.length;i < len;i++){
+                console.log(this.curYear + '-' + this.curMonth + '-' + dates[i].day, curDate);
                 className = dates[i].disabled || !dates[i].day ? 'disabled' : 'act'
-                className += this.curYear + '-' + this.curMonth + '-' + dates[i].day == curDate ? ' select' : ''
+                className += this.curYear + '-' + fullNum(this.curMonth) + '-' + fullNum(dates[i].day) == curDate ? ' select' : ''
                 dom += '<span class="' + className + '">' + dates[i].day + '</span>'
             }
             container.innerHTML = dom
