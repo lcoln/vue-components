@@ -17,7 +17,7 @@
                     func.apply(dom, e)
                 }, capture)
             }
-        }else if(window.det){
+        }else if(window.attachEvent){
             return function(dom, event, func, capture){
                 dom.attachEvent("on" + event, function(e){
                     func.apply(dom, e)

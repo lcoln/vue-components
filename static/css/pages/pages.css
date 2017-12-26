@@ -6,8 +6,6 @@
  * @version $Id$
  */
 
-*{outline: none;}
-.ms-controller,[ms-controller]{visibility: hidden;}
 .ui-pages{height: 31px;line-height: 29px;text-align: center;letter-spacing: -4px;font-size: 13px;}
 .ui-pages span{display: inline-block;width: 30px;border: 1px solid #ddd;border-right: none;cursor: pointer;letter-spacing: 0;}
 .ui-pages .first,.ui-pages .last{width: 50px;}

@@ -108,195 +108,91 @@ if (!Object.keys) {
 
 var skin = ['skin-0','skin-1','skin-2','skin-3']
 
-/**
- * [根据当前幻灯片索引获取填充底下按钮数据]
- * @param  {Object} vm [vm对象]
- * @return {[Array]}    [填充到按钮的数据]
- */
-function getBtnList(vm, el){
-    if(el){
-        dom = el
-    }
-    vm.maxNum = Math.floor(dom.offsetWidth / 90)
-    var curr = vm.curr + 1
-    let res = []
-    if(!vm.preview)
-        res = vm.sliderList
+function setBoxStyle(parentDom, container, box){
+    var i = 0,
+        len = box.length
 
-    if(vm.maxNum >= vm.sliderList.length){
-        res = vm.sliderList
-    }else{
-        if(curr > vm.maxNum){
-            res = vm.sliderList.slice(curr - vm.maxNum, curr)
-        }else if(curr <= vm.maxNum){
-            res = vm.sliderList.slice(0, vm.maxNum)
+    if(this.type == 1){
+        container.style.cssText = 'width: ' + this.maxPage * 100 + '%;height: 100%;'
+        for(;i < len;i++){
+            box[i].className += ' left'
+            box[i].style.cssText = 'float: left;width: ' + 100 / this.maxPage + '%;transition: .4s;'
+        }
+    }else if(this.type == 2){
+        container.style.cssText = 'height: ' + this.maxPage * 100 + '%;width: 100%;'
+        for(;i < len;){
+            box[i++].style.cssText = 'height: ' + 100 / this.maxPage + '%;transition: .4s;'
         }
     }
-    return res
-}
 
-/**
- * [设置自动轮播]
- * @param  {[type]} vm [description]
- * @return {[type]}    [description]
- */
-function autoSlide(vm){
-    vm.timer = setTimeout(function(){
-        vm.$go(1)
-        autoSlide(vm)
-    }, vm.time <= 0 ? 3000 : vm.time)
 }
 
 window.UiSliders = function (){}
+
 UiSliders.prototype = {
-
-    id: Date.now() + '_waterfall',
-
-    currWidth: 0,
-    animation: '',
-    curr: 0,
-    sliderBtnList: [],
-    maxNum: 0,
-    timer: function(){},
-    sliderType: 1,
-
-    sliderList: [],
-    autoSlide: '',
-    time: 3000,
-    preview: false,
-    skin: 0,
-    fullScreen: false,
-
-    onSuccess: function(){},
-    setSliderList: function(list){
-        this.sliderBtnList.removeAll()
-        this.sliderList.pushArray(list)
-    },
-    jump: function(i){
-        var curr = this.curr + 1
-        if(curr > this.maxNum && this.preview){
-            var distance = this.maxNum - (i + 1)
-            this.curr -= distance
-        }else{
-            this.curr = i
-        }
-    },
-    stopSlide: function(){
-        if(this.autoSlide){
-            clearTimeout(this.timer)
-        }
-    },
-    startSlide: function(){
-        if(this.autoSlide)
-            autoSlide(this)
-    },
-    go: function(num){
-        this.curr += num
-        if(this.curr < 0){
-            this.curr = this.sliderList.length - 1
-        }else if(this.curr > this.sliderList.length - 1){
-            this.curr = 0
-        }
-    },
-    init: function(parendId, config, callback){
-        console.log(config);
-        var parentDom = document.getElementById(parendId)
-        if(!parentDom)
-            return
-
+    id: Date.now() + '_UiSliders',
+    hasCss: false,
+    type: 1,        //1: 水平; 2: 垂直;
+    curPage: 1,
+    maxPage: 0,
+    init: function(parentId, childId, config){
         config = config ? config : {}
-        for(var it of Object.keys(config)){
-            if(it === 'skin' && !skin.includes(config[it]))
-                continue
-            if(this[it] || this[it] == 0){
-                this[it] = config[it]
-            }
-        }
+        var parentDom = document.getElementById(parentId),
+            childHtml = parentDom.innerHTML,
+            container = document.createElement('section'),
+            _self = this
+
+        this.type = config.type || 1
+        this.maxPage = parentDom.children.length
+
+        parentDom.style.cssText = 'position: relative;overflow: hidden;'
+
+        container.className = 'ui-sliders'
+        container.innerHTML = childHtml
+        var box = container.querySelectorAll('.' + childId)
+
+        setBoxStyle.call(this, parentDom, container, box)
 
         if(!UiSliders.prototype.hasCss){
-            document.head.innerHTML += '<link rel="stylesheet" type="text/css" href="/static/css/sliders/main.css">'
+            document.head.innerHTML += '<link rel="stylesheet" type="text/css" href="/static/css/sliders/sliders.css">'
         }
         UiSliders.prototype.hasCss = true
 
-        var container = document.createElement('div')
-        container.className = ` ui-sliders`
-        var box = document.createElement('div')
-        box.className = ` skin-box `
-        var content = document.createElement('div')
-        content.className = ` slider-content`
-        if(this.preview && !this.fullScreen)
-            content.className += ' h-83'
-        if(!this.preview || this.fullScreen)
-            content.className += ' h-100'
-
-        if(this.fullScreen){
-            container.className += ' fullscreen'
-        }
-        box.appendChild(content)
-        container.appendChild(box)
+        parentDom.innerHTML = ''
         parentDom.appendChild(container)
+        var btnClass = this.type == 1 ? 'ui-sliders-horizontal-btn' : 'ui-sliders-vertical-btn'
+        parentDom.innerHTML = '<a class="iconfont ' + btnClass + '" href="javascript:;">&#xe697;</a>' + parentDom.innerHTML + '<a class="iconfont ' + btnClass + '" href="javascript:;">&#xe6a7;</a>'
 
-        var _this = this
-        this.skin = skin[this.skin]
-        box.className += this.skin
-        this.currWidth = (100 / this.sliderList.length)
-        console.log(this.autoSlide);
-        if(this.autoSlide)
-            autoSlide(this)
-
-        if(this.preview){
-            this.sliderBtnList.removeAll()
-            this.sliderBtnList.pushArray(getBtnList(this, el))
-        }
-
-        this.render(container, this.sliderList)
-
-
-        observable(this, 'curr', function(val){
-
-            _this.animation = _this.sliderType > 2 ? 'translate(0, ' + (-_this.currWidth * val) + '%)' : 'translate(' + (-_this.currWidth * val) + '%, 0)'
-            if(_this.preview && _this.maxNum < _this.sliderList.length){
-                _this.sliderBtnList.removeAll()
-                _this.sliderBtnList.pushArray(getBtnList(_this, el))
-            }
+        listen(parentDom.firstChild, 'click', function(ev){
+            if(_self.curPage == 1)
+                _self.curPage = _self.maxPage
+            else
+                _self.curPage -= 1
         })
 
-        listen(window, 'resize', function(ev){
+        listen(parentDom.lastChild, 'click', function(ev){
+            if(_self.curPage == _self.maxPage)
+                _self.curPage = 1
+            else
+                _self.curPage += 1
+        })
 
-            _this.animation = _this.sliderType > 2 ? 'translate(0, ' + (-_this.currWidth * _this.curr) + '%)' : 'translate(' + (-_this.currWidth * _this.curr) + '%, 0)'
-            if(_this.preview && _this.maxNum < _this.sliderList.length){
-                _this.sliderBtnList.removeAll()
-                _this.sliderBtnList.pushArray(getBtnList(_this, el))
+        observable(this, 'curPage', function(){
+            var container = parentDom.querySelector('.ui-sliders'),
+                box = [].slice.call(container.querySelectorAll('.' + childId)),
+                i = 0,
+                len = box.length;
+
+
+            for(;i < len;i++){
+                if(i + 1 == _self.curPage)
+                    box[i].style.opacity = 1
+                else
+                    box[i].style.opacity = 0
             }
-        }, false)
-
-        if(this.sliderType >= 3){
-            var now = 0
-            var mouseWheelEv = /Firefox/i.test(navigator.userAgent) ? "DOMMouseScroll": "mousewheel"
-            var direction = /Firefox/i.test(navigator.userAgent) ? "detail": "deltaY"
-
-            listen(window, mouseWheelEv, function(ev){
-                if(Date.now() - now > 500 || now == 0){
-                    if(ev[direction] > 0){
-                        this.$go(1)
-                    }else{
-                        this.$go(-1)
-                    }
-                    now = Date.now()
-                }
-            }, false)
-
-        }
-
-        this.onSuccess(this)
-    },
-    render: function(container, sliders){
-        if(sliders.length > 0 && container){
-            var dom = '<div class="skin-box" ms-class=" ' + this.skin + ' "></div>'
-        }
-
+            parentDom.querySelector('.ui-sliders').style.cssText += 'transform: translate(' + (_self.curPage - 1) * (-100 / _self.maxPage) + '%, 0)'
+        })
     }
 }
 
-UiSliders.prototype.hasCss = false
 

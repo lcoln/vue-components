@@ -63,6 +63,7 @@ var observable = function(obj, prop, cb){
 
 }
 
+//将瀑布流元素填充进容器里
 function fillBox(childDom){
 
     var frag = document.createDocumentFragment()

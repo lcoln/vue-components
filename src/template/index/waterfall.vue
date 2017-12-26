@@ -92,7 +92,7 @@ es6: https://components.cncoders.me/components/waterfall/main-es6.js //import Ui
 
             UiLazyLoading(dom, function(){
                 waterfall.addBox('waterfall', 'waterfall-box')
-            })
+            }, 500)
             var waterfall1 = new UiWaterFall()
             waterfall1.init('waterfall1', 'waterfall-box', {width: 200, range: [300, 400]})
         },

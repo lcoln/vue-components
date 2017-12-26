@@ -32,7 +32,7 @@
 
             UiLazyLoading(dom, function(){
                 createDiv()
-            })
+            }, 500)
 
             function createDiv(){
                 var arr = new Array(60).fill(0)
