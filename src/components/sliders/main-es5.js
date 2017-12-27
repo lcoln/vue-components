@@ -106,14 +106,12 @@ if (!Object.keys) {
     }());
 }
 
-var skin = ['skin-0','skin-1','skin-2','skin-3']
-
-function setBoxStyle(parentDom, container, box){
+function setBoxStyle(container, box){
     var i = 0,
         len = box.length
 
     if(this.type == 1){
-        container.style.cssText = 'width: ' + this.maxPage * 100 + '%;height: 100%;'
+        container.style.cssText = 'width: ' + this.maxPage * 100 + '%;'
         for(;i < len;i++){
             box[i].className += ' left'
             box[i].style.cssText = 'float: left;width: ' + 100 / this.maxPage + '%;transition: .4s;'
@@ -127,6 +125,21 @@ function setBoxStyle(parentDom, container, box){
 
 }
 
+function fillNav(width){
+    var navHtml = []
+    // var style = width > 0 ? 'style="width: "'
+    for(var i = 0;i < this.maxPage;i++){
+        var className = i + 1 == this.curPage ? 'act' : ''
+
+        navHtml.push('<div class="ui-sliders-nav-btn ' + className + '" data-index="' + (i + 1) + '"></div>')
+    }
+    return navHtml.join('')
+}
+
+function preview(){
+
+}
+
 window.UiSliders = function (){}
 
 UiSliders.prototype = {
@@ -135,63 +148,91 @@ UiSliders.prototype = {
     type: 1,        //1: 水平; 2: 垂直;
     curPage: 1,
     maxPage: 0,
+    preview: false,
     init: function(parentId, childId, config){
         config = config ? config : {}
+
         var parentDom = document.getElementById(parentId),
             childHtml = parentDom.innerHTML,
             container = document.createElement('section'),
             _self = this
 
-        this.type = config.type || 1
-        this.maxPage = parentDom.children.length
+        for(var it in config){
+            if(this[it] || UiSliders.prototype.hasOwnProperty(it)){
+                this[it] = config[it]
+            }
+        }
 
-        parentDom.style.cssText = 'position: relative;overflow: hidden;'
+        this.maxPage = parentDom.children.length
 
         container.className = 'ui-sliders'
         container.innerHTML = childHtml
         var box = container.querySelectorAll('.' + childId)
 
-        setBoxStyle.call(this, parentDom, container, box)
+        setBoxStyle.call(this, container, box)
 
         if(!UiSliders.prototype.hasCss){
             document.head.innerHTML += '<link rel="stylesheet" type="text/css" href="/static/css/sliders/sliders.css">'
         }
         UiSliders.prototype.hasCss = true
 
-        parentDom.innerHTML = ''
-        parentDom.appendChild(container)
-        var btnClass = this.type == 1 ? 'ui-sliders-horizontal-btn' : 'ui-sliders-vertical-btn'
-        parentDom.innerHTML = '<a class="iconfont ' + btnClass + '" href="javascript:;">&#xe697;</a>' + parentDom.innerHTML + '<a class="iconfont ' + btnClass + '" href="javascript:;">&#xe6a7;</a>'
 
-        listen(parentDom.firstChild, 'click', function(ev){
-            if(_self.curPage == 1)
-                _self.curPage = _self.maxPage
-            else
-                _self.curPage -= 1
+        var typeBox = document.createElement('div')
+        typeBox.className = this.type == 1 ? ' ui-sliders-horizontal ' : ' ui-sliders-vertical '
+        typeBox.className += this.preview ? ' ui-sliders-preview ' : ' ui-sliders-nopreview '
+        typeBox.style.cssText = 'position: relative;overflow: hidden;width: 100%;height: 100%;'
+        typeBox.appendChild(container)
+
+
+        var navGroup = document.createElement('section')
+        navGroup.className = 'ui-sliders-nav-group'
+
+
+        if(this.preview){
+            console.log(parentDom.offsetWidth * 0.8 - 60);
+            // navGroup.innerHTML = fillNav.call(this)
+            navGroup.innerHTML = '<a class="iconfont ui-sliders-btn" href="javascript:;">&#xe697;</a>' + navGroup.innerHTML + '<a class="iconfont ui-sliders-btn" href="javascript:;">&#xe6a7;</a>'
+            typeBox.appendChild(navGroup)
+
+        }else{
+            navGroup.innerHTML = fillNav.call(this)
+            typeBox.appendChild(navGroup)
+            typeBox.innerHTML = '<a class="iconfont ui-sliders-btn" href="javascript:;">&#xe697;</a>' + typeBox.innerHTML + '<a class="iconfont ui-sliders-btn" href="javascript:;">&#xe6a7;</a>'
+        }
+
+        parentDom.innerHTML = ''
+        parentDom.appendChild(typeBox)
+
+        listen(typeBox.firstChild, 'click', function(ev){
+            _self.curPage = _self.curPage == 1 ? _self.maxPage : (_self.curPage - 1)
         })
 
-        listen(parentDom.lastChild, 'click', function(ev){
-            if(_self.curPage == _self.maxPage)
-                _self.curPage = 1
-            else
-                _self.curPage += 1
+        listen(typeBox.lastChild, 'click', function(ev){
+            _self.curPage = (_self.curPage == _self.maxPage) ? 1 : (_self.curPage + 1)
+        })
+
+        listen(typeBox.querySelector('.ui-sliders-nav-group'), 'click', function(ev){
+            if(/ui-sliders-nav-btn/.test(ev.target.className)){
+                _self.curPage = ev.target.getAttribute('data-index') - 0
+            }
         })
 
         observable(this, 'curPage', function(){
-            var container = parentDom.querySelector('.ui-sliders'),
+            var container = typeBox.querySelector('.ui-sliders'),
                 box = [].slice.call(container.querySelectorAll('.' + childId)),
+                btns = typeBox.querySelector('.ui-sliders-nav-group').children,
                 i = 0,
                 len = box.length;
 
-
             for(;i < len;i++){
-                if(i + 1 == _self.curPage)
-                    box[i].style.opacity = 1
-                else
-                    box[i].style.opacity = 0
+                box[i].style.opacity = i + 1 == _self.curPage ? 1 : 0
+                btns[i].className = i + 1 == _self.curPage ? 'ui-sliders-nav-btn act' : 'ui-sliders-nav-btn'
             }
-            parentDom.querySelector('.ui-sliders').style.cssText += 'transform: translate(' + (_self.curPage - 1) * (-100 / _self.maxPage) + '%, 0)'
+
+            container.style.cssText += 'transform: translate(' + (_self.curPage - 1) * (-100 / _self.maxPage) + '%, 0)'
         })
+
+
     }
 }
 

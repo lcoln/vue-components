@@ -6,6 +6,14 @@
                 <div class="slider-item"></div>
                 <div class="slider-item"></div>
                 <div class="slider-item"></div>
+                <div class="slider-item"></div>
+            </div>
+            <div id="slider2">
+                <div class="slider-item"></div>
+                <div class="slider-item"></div>
+                <div class="slider-item"></div>
+                <div class="slider-item"></div>
+                <div class="slider-item"></div>
             </div>
         </div>
         <pre class="code" v-if="showType == 2" v-text="code">
@@ -34,10 +42,9 @@
         mounted: function(){
             require('@/components/sliders/main-es5.js')
             var slider = new UiSliders()
-            slider.init('slider', 'slider-item', {})
-            /*var slider2 = new UiSliders()
-            slider2.init('slider2', 'page', '.4')*/
-            // console.log(fullpage2);
+            slider.init('slider', 'slider-item', {preview: true})
+            var slider2 = new UiSliders()
+            slider2.init('slider2', 'slider-item', {})
         },
         computed: {
             showType () {
@@ -48,10 +55,19 @@
 </script>
 
 <style rel="stylesheet" lang="scss" type="text/css" scoped>
-    #slider{width: 400px;height: 300px;margin: 0 auto;background: #bbb;}
+    #slider{width: 600px;height: 400px;margin: 0 auto;}
     #slider .slider-item{width: 100%;height: 100%;}
-    #slider .slider-item:nth-of-type(1){background: lightblue}
-    #slider .slider-item:nth-of-type(2){background: lightgreen}
-    #slider .slider-item:nth-of-type(3){background: #000}
-    #slider .slider-item:nth-of-type(4){background: red}
+    #slider .slider-item:nth-of-type(1){background: #A7C5BD}
+    #slider .slider-item:nth-of-type(2){background: #E5DDCB}
+    #slider .slider-item:nth-of-type(3){background: #EB7B59}
+    #slider .slider-item:nth-of-type(4){background: #CF4647}
+    #slider .slider-item:nth-of-type(5){background: #524656}
+
+    #slider2{width: 600px;height: 400px;margin: 20px auto;}
+    #slider2 .slider-item{width: 100%;height: 100%;}
+    #slider2 .slider-item:nth-of-type(1){background: #A7C5BD}
+    #slider2 .slider-item:nth-of-type(2){background: #E5DDCB}
+    #slider2 .slider-item:nth-of-type(3){background: #EB7B59}
+    #slider2 .slider-item:nth-of-type(4){background: #CF4647}
+    #slider2 .slider-item:nth-of-type(5){background: #524656}
 </style>
