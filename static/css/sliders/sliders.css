@@ -22,6 +22,11 @@
 
 .ui-sliders-horizontal.ui-sliders-preview .ui-sliders{height: 80%}
 .ui-sliders-horizontal.ui-sliders-preview .ui-sliders-nav-group{position: relative;left: 0;right: 0;bottom: 0;height: 20%;line-height: 30px;text-align: center;}
+.ui-sliders-horizontal.ui-sliders-preview .ui-sliders-preview-box{position: relative;height: 100%;text-align: center;overflow: hidden;}
+.ui-sliders-horizontal.ui-sliders-preview .ui-sliders-preview-box .ui-sliders-preview-content{height: 100%;padding: 10px 0px;transition: .4s;}
+.ui-sliders-horizontal.ui-sliders-preview .ui-sliders-preview-box .ui-sliders-preview-content div{float: left;width: 100px;height: 100%;margin: 0 5px;transition: .4s;cursor: pointer;}
+.ui-sliders-horizontal.ui-sliders-preview .ui-sliders-preview-box .ui-sliders-preview-content img{width: 100%;height: 100%;object-fit: cover;}
+.ui-sliders-horizontal.ui-sliders-preview .ui-sliders-preview-box .ui-sliders-preview-content div.act{border: 2px solid #666;}
 .ui-sliders-horizontal.ui-sliders-preview .ui-sliders-nav-btn{}
 
 .ui-sliders-vertical .ui-sliders-vertical-btn{position: absolute;top: 0;bottom: 0;margin: auto 10px;width: 30px;height: 30px;text-align: center;line-height: 30px;font-size: 30px;color: #ddd;transition: .4s;background: rgba(0, 0, 0, .4);z-index: 1000;}

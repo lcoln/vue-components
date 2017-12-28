@@ -106,6 +106,7 @@ if (!Object.keys) {
     }());
 }
 
+//设置幻灯片样式
 function setBoxStyle(container, box){
     var i = 0,
         len = box.length
@@ -125,7 +126,8 @@ function setBoxStyle(container, box){
 
 }
 
-function fillNav(width){
+//设置导航样式(预览)
+function fillNavWhitoutPreview(width){
     var navHtml = []
     // var style = width > 0 ? 'style="width: "'
     for(var i = 0;i < this.maxPage;i++){
@@ -136,8 +138,21 @@ function fillNav(width){
     return navHtml.join('')
 }
 
-function preview(){
+//设置导航样式(无预览)
+function fillNavWhitPreview(parentDom, config){
 
+    var width = parentDom.offsetWidth * 0.8 - 60
+    var left = parentDom.offsetWidth * 0.1 + 30
+    this.maxPreview = Math.floor(width / 110)
+    var box = '<div class="ui-sliders-preview-box" style="width: ' + width + 'px;left: ' + left + 'px;"><div class="ui-sliders-preview-content" style="width: ' + this.maxPage * 110 + 'px;">'
+
+    var tmp = []
+    for(var i = 0;i < this.maxPage;i++){
+        var className = i + 1 == this.curPage ? 'act' : ''
+        tmp.push('<div class="' + className + '"><img src="' + config.source[i] + '" data-index="' + (i + 1) + '" /></div>')
+    }
+    box += tmp.join('') + '</div></div>'
+    return box
 }
 
 window.UiSliders = function (){}
@@ -149,6 +164,7 @@ UiSliders.prototype = {
     curPage: 1,
     maxPage: 0,
     preview: false,
+    maxPreview: 0,
     init: function(parentId, childId, config){
         config = config ? config : {}
 
@@ -187,46 +203,74 @@ UiSliders.prototype = {
         var navGroup = document.createElement('section')
         navGroup.className = 'ui-sliders-nav-group'
 
+        var firstChild = null,
+            lastChild = null,
+            nav = null
 
         if(this.preview){
-            console.log(parentDom.offsetWidth * 0.8 - 60);
-            // navGroup.innerHTML = fillNav.call(this)
+            navGroup.innerHTML = fillNavWhitPreview.call(this, parentDom, config)
+
             navGroup.innerHTML = '<a class="iconfont ui-sliders-btn" href="javascript:;">&#xe697;</a>' + navGroup.innerHTML + '<a class="iconfont ui-sliders-btn" href="javascript:;">&#xe6a7;</a>'
             typeBox.appendChild(navGroup)
 
+            firstChild = navGroup.firstChild
+            lastChild = navGroup.lastChild
+            nav = navGroup.querySelector('.ui-sliders-preview-content')
+
         }else{
-            navGroup.innerHTML = fillNav.call(this)
+            navGroup.innerHTML = fillNavWhitoutPreview.call(this)
             typeBox.appendChild(navGroup)
             typeBox.innerHTML = '<a class="iconfont ui-sliders-btn" href="javascript:;">&#xe697;</a>' + typeBox.innerHTML + '<a class="iconfont ui-sliders-btn" href="javascript:;">&#xe6a7;</a>'
+
+            firstChild = typeBox.firstChild
+            lastChild = typeBox.lastChild
+            nav = typeBox.querySelector('.ui-sliders-nav-group')
+
         }
+
+        listen(firstChild, 'click', function(ev){
+            _self.curPage = _self.curPage == 1 ? _self.maxPage : (_self.curPage - 1)
+        })
+
+        listen(lastChild, 'click', function(ev){
+            _self.curPage = (_self.curPage == _self.maxPage) ? 1 : (_self.curPage + 1)
+        })
+
+        listen(nav, 'click', function(ev){
+            var index = ev.target.getAttribute('data-index')
+            if(index){
+                _self.curPage = index - 0
+            }
+        })
 
         parentDom.innerHTML = ''
         parentDom.appendChild(typeBox)
 
-        listen(typeBox.firstChild, 'click', function(ev){
-            _self.curPage = _self.curPage == 1 ? _self.maxPage : (_self.curPage - 1)
-        })
 
-        listen(typeBox.lastChild, 'click', function(ev){
-            _self.curPage = (_self.curPage == _self.maxPage) ? 1 : (_self.curPage + 1)
-        })
 
-        listen(typeBox.querySelector('.ui-sliders-nav-group'), 'click', function(ev){
-            if(/ui-sliders-nav-btn/.test(ev.target.className)){
-                _self.curPage = ev.target.getAttribute('data-index') - 0
-            }
-        })
-
-        observable(this, 'curPage', function(){
+        observable(this, 'curPage', function(v){
             var container = typeBox.querySelector('.ui-sliders'),
                 box = [].slice.call(container.querySelectorAll('.' + childId)),
-                btns = typeBox.querySelector('.ui-sliders-nav-group').children,
+                btns = null,
                 i = 0,
-                len = box.length;
+                len = box.length,
+                movex = _self.maxPreview - v;
 
-            for(;i < len;i++){
-                box[i].style.opacity = i + 1 == _self.curPage ? 1 : 0
-                btns[i].className = i + 1 == _self.curPage ? 'ui-sliders-nav-btn act' : 'ui-sliders-nav-btn'
+            if(!_self.preview){
+                btns = typeBox.querySelector('.ui-sliders-nav-group').children
+                for(;i < len;i++){
+                    box[i].style.opacity = i + 1 == v ? 1 : 0
+                    btns[i].className = i + 1 == v ? 'ui-sliders-nav-btn act' : 'ui-sliders-nav-btn'
+                }
+
+            }else{
+                btns = typeBox.querySelector('.ui-sliders-preview-content').children
+                for(;i < len;i++){
+                    box[i].style.opacity = i + 1 == v ? 1 : 0
+                    btns[i].className = i + 1 == v ? 'act' : ''
+                }
+                typeBox.querySelector('.ui-sliders-preview-content').style.transform = movex < 0 ? 'translate(' + movex * 110 + 'px, 0)' : 'translate(0, 0)'
+
             }
 
             container.style.cssText += 'transform: translate(' + (_self.curPage - 1) * (-100 / _self.maxPage) + '%, 0)'
