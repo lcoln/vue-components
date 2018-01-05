@@ -14,6 +14,7 @@
                 <a class="item" :class="{'act': currView === 'datepicker'}" href="#!/datepicker">日历组件</a>
                 <a class="item" :class="{'act': currView === 'layer'}" href="#!/layer">弹窗组件</a>
                 <a class="item" :class="{'act': currView === 'lazy_loading'}" href="#!/lazy_loading">懒加载</a>
+                <!-- <a class="item" :class="{'act': currView === 'router'}" href="#!/router">路由</a> -->
             </nav>
         </aside>
         <content>
@@ -40,6 +41,7 @@
     import datepicker from './template/index/datepicker.vue'
     import layer from './template/index/layer.vue'
     import lazy_loading from './template/index/lazy_loading.vue'
+    import router from './template/index/router/router.vue'
 
     export default {
         name: 'app',
@@ -58,8 +60,8 @@
                 this.currView = m;
             }).bind(this)
 
-            vue.router.get('/', () => callback('home'))
-            vue.router.get('/:id', m => callback(m))
+            vue.router.on('/', () => callback('home'))
+            vue.router.on('/:id', m => callback(m))
         },
         computed: {
             showType () {
@@ -75,7 +77,8 @@
             pages,
             datepicker,
             layer,
-            lazy_loading
+            lazy_loading,
+            router
         },
     }
 </script>

@@ -4,7 +4,7 @@
  * @date    2017-12-28 17:24:03
  */
 
-define(['vue'], function(){
+define(['vue'], function(vue){
 
     if(typeof Object.assign !== 'function'){
         Object.assign = function(target, para){
@@ -28,6 +28,26 @@ define(['vue'], function(){
             }
 
             return to
+        }
+    }
+
+    if(!vue.ensure){
+        vue.ensure = function(target, para){
+            if(target.indexOf(para) === -1){
+                return target.push(para)
+            }
+        }
+    }
+
+    if(!vue.listen){
+        vue.bind = function(el, ev, fn, capture){
+            if(window.addEventListener){
+                el.addEventListener(ev, fn, capture)
+            }else if(window.attachEvent){
+                el.attachEvent('on' + ev, fn, capture)
+            }else{
+                el['on' + ev] = fn
+            }
         }
     }
 
@@ -61,6 +81,7 @@ define(['vue'], function(){
             if(!opts.allowReload)
                 opts.historyOpen = true;
             this.init = Object.assign({}, defaultOptions, opts);
+            console.log(111);
         },
         _getRegExp: function(rule, opts){
             var re = rule.replace(ruleRegExp, function(m, p1, p2, p3, p4){
@@ -92,7 +113,7 @@ define(['vue'], function(){
             var opts = {};
             opts.rule = rule;
             opts.callback = callback;
-            vue.Array.ensure(table, this._getRegExp(rule, opts));
+            vue.ensure(table, this._getRegExp(rule, opts));
         },
         _route: function(method, hash){
             var hash = hash.trim();
@@ -196,8 +217,6 @@ define(['vue'], function(){
         }
         return false
     }
-
-    vue.ui.router = '0.0.1'
 
     return vue.router = new Router;
 })

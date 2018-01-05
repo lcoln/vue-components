@@ -33,7 +33,8 @@
                         <span>{{el.skill}}</span>
                     </li>
                 </ul>
-                <div id="pages2"></div>
+                <!-- <div id="pages2"></div> -->
+                <UiPages :pageOpts="pageOpts"></UiPages>
             </div>
         </div>
         <pre class="code" v-if="showType == 2">
@@ -47,7 +48,8 @@
 <script>
     import store from 'store'
     import vue from 'vue'
-    import UiPages from '@/components/pages/main-es6.js'
+    // import UiPages from '@/components/pages/main-es6.js'
+    import UiPages from '@/components/pages/main.vue'
 
     function showData(list, curr, num = 10){
         var start = (curr - 1) * num
@@ -64,8 +66,19 @@
         return data
     }
 
+    let arr = []
+    for(let i = 0;i<88;i++){
+        arr[i] = {name: 'lili', sex: 'man', age: i, skill: 'html5'}
+    }
+
+    let arr2 = []
+    for(let i = 0;i<120;i++){
+        arr2[i] = {name: 'lili', sex: 'women', age: 19, skill: `html${i}`}
+    }
+
     export default {
         data () {
+            var _self = this
             return {
                 code: `
 <div id="pages"></div>
@@ -94,28 +107,27 @@ es6: https://components.cncoders.me/components/pages/main-es6.js //import UiPage
 <\/script>`,
                 list: [],
                 list2: [],
+                pageOpts: {
+                    total: Math.ceil(arr2.length / 10),
+                    max: 6,
+                    showJumpBtn: true,
+                    callback:  function(curr) {
+                        _self.list2 = showData(arr2, curr)
+                    }
+                }
             }
         },
         methods: {
 
         },
         mounted: async function(){
-            let arr = []
-            for(let i = 0;i<88;i++){
-                arr[i] = {name: 'lili', sex: 'man', age: i, skill: 'html5'}
-            }
-
-            let arr2 = []
-            for(let i = 0;i<120;i++){
-                arr2[i] = {name: 'lili', sex: 'women', age: 19, skill: `html${i}`}
-            }
 
 
             this.list = showData(arr, 1)
-            this.list2 = showData(arr2, 1, 15)
+            this.list2 = showData(arr2, 1, 10)
             let _this = this
             // require('@/components/pages/main-es5.js')
-            var pages = new UiPages()
+            /*var pages = new UiPages()
             pages.init('pages', {
                 total: Math.ceil(arr.length / 10),
                 max: 8, skin: 'green',
@@ -133,7 +145,7 @@ es6: https://components.cncoders.me/components/pages/main-es6.js //import UiPage
                 showJumpBtn: true
             }, function(curr){
                 _this.list2 = showData(arr2, curr, 15)
-            })
+            })*/
         },
         computed: {
             showType () {
@@ -141,7 +153,7 @@ es6: https://components.cncoders.me/components/pages/main-es6.js //import UiPage
             }
         },
         components: {
-
+            UiPages
         }
     }
 </script>

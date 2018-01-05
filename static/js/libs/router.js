@@ -1,172 +1,221 @@
-"use strict"
-// import vue from ''
-define(['vue'],function(vue){
+/**
+ *
+ * @authors linteng (875482941@qq.com)
+ * @date    2017-12-28 17:24:03
+ */
 
-	var ensure = function (target, item) {
-	    //只有当前数组不存在此元素时只添加它
-	    if (target.indexOf(item) === -1) {
-	        return target.push(item)
-	    }
-	}
+define(['vue'], function(vue){
 
-	var ruleRegExp = /(:id)|(\{id\})|(\{id:([A-z\d\,\[\]\{\}\-\+\*\?\!:\^\$]*)\})/g;
-	var isMouseUp = true
-	var defaultOptions = {
-		prefix: /^(#!|#)[\/]?/,		//hash前缀正则
-		historyOpen: true,		//是否开启hash历史
-		allowReload: true		//连续点击同一个链接是否重新加载
-	}
-	function Router(){
-		this.table = {get: []}
-		this.started = false		//是否配置过路由
-		this.init = {}
-		this.hash = ''
-		this.history = null
-		this.errorFn = null
-	}
+    if(typeof Object.assign !== 'function'){
+        Object.assign = function(target, para){
+            'use strict'
 
-	Router.prototype = {
-		error: function(callback){
-			this.errorFn = callback
-		},
-		config: function(opts){
-			if(this.started)
-				return console.error('Router config has been set')
+            if(target == null)
+                throw new TypeError('shit')
 
-			this.started = true
-			//默认连续点击同一个链接重新加载
-			if(!opts.allowReload)
-				opts.allowReload = true
-			this.init = {
-				extends: {},opts,defaultOptions
-			}
-		},
-		//生成正则匹配规则
-		_getRegExp: function(rule, opts){
-			var re = rule.replace(ruleRegExp, function(m, p1, p2, p3, p4){
-				var w = '(\\w';
-				if(p1 || p2){
-					return w + '+)';
-				}else{
-					if(!/^\{[\d\,]+\}$/.test(p4)){
-						w = '(';
-					}
-					return w + p4 + ')';
-				}
-			})
-			re = re.replace(/(([^\\])([\/]+))/g, '$2\\/').replace(/(([^\\])([\.]+))/g, '$2\\.').replace(/(([^\\])([\-]+))/g, '$2\\-').replace(/(\(.*)(\\[\-]+)(.*\))/g, '$1-$3');
-			re = '^' + re + '$';
-			opts.regexp = new RegExp(re)
-			return opts;
-		},
-		_add: function(method, rule, callback){
-			if(!this.started)
-				this.config({})
+            var to = Object(target),
+                i = 0
 
-			var table = this.table[method.toLowerCase()]
-			if(rule.charAt(0) !== "/"){
-				console.error('char "/" must be in front of router rule')
-				return
-			}
-			rule = rule.replace(/^[\/]|[\/]|\s+/g,'')
-			var opts = {}
-			opts.rule = rule
-			opts.callback = callback
-			ensure(table,this._getRegExp(rule,opts))
-		},
-		_route: function(method, hash){
-			var hash = hash.trim();
-			var table = this.table[method];
-			var init = this.init;
-			if(!init.defaultOptions.allowReload && hash === this.history)
-				return;
+            for(;i < arguments.length;){
+                var source = arguments[i++]
 
-			if(init.defaultOptions.historyOpen){
-				this.history = hash;
-				if(vue.ls)
-					vue.ls('lastHash', hash);
-			}
+                if(source !== null){
+                    for(var k in source){
+                        if(Object.prototype.hasOwnProperty.call(source, k))
+                            to[k] = source[k]
+                    }
+                }
+            }
 
-			for(var i = 0, obj; obj = table[i++];){
-				var args = hash.match(obj.regexp);
-				if(args){
-					args.shift();
-					obj.callback.apply(obj, args)
-					return
-				}
-			}
-			this.errorFn && this.errorFn(hash);
-		},
-		get: function(rule,callback){
-			this._add('get',rule,callback)
-		}
-	}
+            return to
+        }
+    }
+
+    if(!vue.ensure){
+        vue.ensure = function(target, para){
+            if(target.indexOf(para) === -1){
+                return target.push(para)
+            }
+        }
+    }
+
+    if(!vue.listen){
+        vue.bind = function(el, ev, fn, capture){
+            if(window.addEventListener){
+                el.addEventListener(ev, fn, capture)
+            }else if(window.attachEvent){
+                el.attachEvent('on' + ev, fn, capture)
+            }else{
+                el['on' + ev] = fn
+            }
+        }
+    }
+
+    function Router(){
+        this.table = {get: []};
+        this.errorFn = null;
+        this.history = null;
+        this.hash = '';
+        this.started = false;
+        this.init = {};
+    }
+
+    var defaultOptions = {
+        prefix: /^(#!|#)[\/]?/, //hash前缀正则
+        historyOpen: true, //是否开启hash历史
+        allowReload: true //连续点击同一个链接是否重新加载
+    };
+    var isMouseUp = true;
+
+    var ruleRegExp = /(:id)|(\{id\})|(\{id:([A-z\d\,\[\]\{\}\-\+\*\?\!:\^\$]*)\})/g;
+
+    Router.prototype = {
+        error: function(callback){
+            this.errorFn = callback;
+        },
+        config: function(opts){
+            if(this.started)
+                return console.error('Router config has been set');
+
+            this.started = true;
+            if(!opts.allowReload)
+                opts.historyOpen = true;
+            this.init = Object.assign({}, defaultOptions, opts);
+        },
+        _getRegExp: function(rule, opts){
+            var re = rule.replace(ruleRegExp, function(m, p1, p2, p3, p4){
+                var w = '([\\w.-]';
+                if(p1 || p2){
+                    return w + '+)';
+                }else{
+                    if(!/^\{[\d\,]+\}$/.test(p4)){
+                        w = '(';
+                    }
+                    return w + p4 + ')';
+                }
+            })
+            re = re.replace(/(([^\\])([\/]+))/g, '$2\\/').replace(/(([^\\])([\.]+))/g, '$2\\.').replace(/(([^\\])([\-]+))/g, '$2\\-').replace(/(\(.*)(\\[\-]+)(.*\))/g, '$1-$3');
+            re = '^' + re + '$';
+            opts.regexp = new RegExp(re)
+            return opts;
+        },
+        _add: function(method, rule, callback){
+            if(!this.started)
+                this.config({});
+
+            var table = this.table[method.toLowerCase()];
+            if (rule.charAt(0) !== "/") {
+                console.error('char "/" must be in front of router rule');
+                return;
+            }
+            rule = rule.replace(/^[\/]+|[\/]+$|\s+/g, '');
+            var opts = {};
+            opts.rule = rule;
+            opts.callback = callback;
+            vue.ensure(table, this._getRegExp(rule, opts));
+        },
+        _route: function(method, hash){
+            var hash = hash.trim();
+            var table = this.table[method];
+            var init = this.init;
+
+            if(!init.allowReload && hash === this.history)
+                return;
+
+            if(init.historyOpen){
+                this.history = hash;
+                if(vue.ls)
+                    vue.ls('lastHash', hash);
+            }
+
+            for(var i = 0, obj; obj = table[i++];){
+                var args = hash.match(obj.regexp);
+                if(args){
+                    args.shift();
+                    return obj.callback.apply(obj, args)
+                }
+            }
+            this.errorFn && this.errorFn(hash);
+        },
+        on: function(rule, callback){
+            var _this = this
+            if(Array.isArray(rule)){
+                rule.forEach(function(it){
+                    _this._add('get', it, callback);
+                })
+            }else{
+                this._add('get', rule, callback);
+            }
+        }
+    }
+
+    vue.bind(window, 'load', function(){
+        if(!vue.router.started)
+            return;
+        var prefix = vue.router.init.prefix;
+        var hash = location.hash;
+        hash = hash.replace(prefix, "").trim();
+        vue.router._route('get', hash);
+    });
 
 
+    if('onhashchange' in window){
+        window.addEventListener('hashchange', function(event){
+            if(!isMouseUp)
+                return;
+            var prefix = vue.router.init.prefix;
+            var hash = location.hash.replace(prefix, "").trim();
+            vue.router._route('get', hash)
+        })
+    }
 
-	if('onhashchange' in window){
-		window.addEventListener('hashchange', function(event){
-			if(!isMouseUp)
-				return
-			var prefix = vue.router.init.defaultOptions.prefix
-			var hash = location.hash.replace(prefix, "").trim()
-			vue.router._route('get', hash)
-		})
-	}
+    //劫持页面上所有点击事件，如果事件源来自链接或其内部，
+    //并且它不会跳出本页，并且以"#/"或"#!/"开头，那么触发updateLocation方法
+    vue.bind(document, "mousedown", function(event){
+        var defaultPrevented = "defaultPrevented" in event ? event['defaultPrevented'] : event.returnValue === false
+        if (defaultPrevented || event.ctrlKey || event.metaKey || event.which === 2)
+            return
+        var target = event.target
+        while (target.nodeName !== "A") {
+            target = target.parentNode
+            if (!target || target.tagName === "BODY") {
+                return
+            }
+        }
 
-	window.addEventListener('load',function(){
-		if(!vue.router.started)
-			return
-		var prefix = vue.router.init.defaultOptions.prefix
-		var hash = location.hash
-		hash = hash.replace(prefix, "").trim()
-		vue.router._route('get', hash)
-	})
+        if (targetIsThisWindow(target.target)){
+            if(!vue.router.started)
+                return;
+            var href = target.getAttribute("href") || target.getAttribute("xlink:href"),
+                prefix = vue.router.init.prefix;
 
-	document.addEventListener('mouseup',function(){
-		if(!isMouseUp){
-			vue.router._route('get', vue.router.hash)
-			isMouseUp = true
-		}
-	})
+            if (href === null || !prefix.test(href))
+                return
 
-	document.addEventListener('mousedown',function(event){
-		var defaultPrevent = "defaultPrevent" in event ? event["defaultPrevent"] : event.returnValue === false
+            vue.router.hash = href.replace(prefix, "").trim();
+            event.preventDefault();
+            location.hash = href;
+            isMouseUp = false;
+        }
+    })
 
-		//当阻止了默认事件，或者按住ctrl,meta或者鼠标中键时return
-		if(defaultPrevent || event.ctrlKey || event.metaKey || event.whith === 2)
-			return
+    vue.bind(document, "mouseup", function(){
+        if(!isMouseUp){
+            vue.router._route('get', vue.router.hash);
+            isMouseUp = true;
+        }
 
-		var target = event.target
-		while(target.nodeName !== "A"){
-			target = target.parentNode
-			if(!target || target.tagName === "BODY")
-				return
-		}
+    })
 
-		if(targetIsThisWindow(target.target)){
-			//如果未启动路由则返回
-			if(!vue.router.started)
-				return
-			var href = target.getAttribute("href") || target.getAttribute("xlink:href")
-			var	prefix = vue.router.init.defaultOptions.prefix
 
-			if(href === null || !prefix.test(href))
-				return
+    //判定A标签的target属性是否指向自身
+    //thanks https://github.com/quirkey/sammy/blob/master/lib/sammy.js#L219
+    function targetIsThisWindow(targetWindow) {
+        if (!targetWindow || targetWindow === window.name || targetWindow === '_self' || (targetWindow === 'top' && window == window.top)) {
+            return true
+        }
+        return false
+    }
 
-			vue.router.hash = href.replace(prefix, "").trim()
-			event.preventDefault()
-			location.hash = href
-			isMouseUp = false
-		}
-	})
-
-	//判断A标签target是否指向自身
-	function targetIsThisWindow(targetWindow){
-		if(!targetWindow || targetWindow === window.name || targetWindow === '_self' || (targetWindow === 'top' && window == window.top)){
-			return true
-		}
-		return false
-	}
-	return vue.router = new Router;
+    return vue.router = new Router;
 })
